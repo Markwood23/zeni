@@ -5,6 +5,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   Image,
+  Linking,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
@@ -87,8 +88,8 @@ export default function WelcomeScreen() {
 
         <Text style={styles.terms}>
           By continuing, you agree to our{' '}
-          <Text style={styles.link}>Terms of Service</Text> and{' '}
-          <Text style={styles.link}>Privacy Policy</Text>
+          <Text style={styles.link} onPress={() => Linking.openURL('https://zenigh.online/terms.html')}>Terms of Service</Text> and{' '}
+          <Text style={styles.link} onPress={() => Linking.openURL('https://zenigh.online/privacy.html')}>Privacy Policy</Text>
         </Text>
       </View>
     </SafeAreaView>

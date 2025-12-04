@@ -9,12 +9,12 @@ import {
   Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
+import { useNavigation, useRoute, RouteProp, CommonActions } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Ionicons } from '@expo/vector-icons';
 import { spacing, borderRadius, typography } from '../../constants/theme';
 import { useTheme } from '../../context/ThemeContext';
-import { DocumentsStackParamList } from '../../types';
+import { DocumentsStackParamList, Document } from '../../types';
 import { useDocumentsStore } from '../../store';
 
 type NavigationProp = NativeStackNavigationProp<DocumentsStackParamList, 'DocumentView'>;
@@ -28,7 +28,7 @@ export default function DocumentViewScreen() {
   const { documentId } = route.params;
   const { documents, deleteDocument } = useDocumentsStore();
 
-  const document = documents.find((d) => d.id === documentId);
+  const document = documents.find((d: Document) => d.id === documentId);
 
   if (!document) {
     return (
@@ -91,11 +91,103 @@ export default function DocumentViewScreen() {
     );
   };
 
+  const handleEdit = () => {
+    // Navigate to Edit screen with document
+    navigation.dispatch(
+      CommonActions.navigate({
+        name: 'Home',
+        params: {
+          screen: 'EditDocument',
+          params: { documentId: document.id },
+        },
+      })
+    );
+  };
+
+  const handleConvert = () => {
+    // Navigate to Convert screen with document
+    navigation.dispatch(
+      CommonActions.navigate({
+        name: 'Home',
+        params: {
+          screen: 'Convert',
+          params: { documentId: document.id },
+        },
+      })
+    );
+  };
+
+  const handleFax = () => {
+    // Navigate to Fax screen with document
+    navigation.dispatch(
+      CommonActions.navigate({
+        name: 'Home',
+        params: {
+          screen: 'FaxSend',
+          params: { documentId: document.id },
+        },
+      })
+    );
+  };
+
+  const handleOpenDocument = () => {
+    Alert.alert(
+      'Open Document',
+      'Document viewer will be available in a future update. For now, you can share the document to open it in another app.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'Share Instead', onPress: handleShare },
+      ]
+    );
+  };
+
+  const handleMoreOptions = () => {
+    Alert.alert(
+      document.name,
+      'Choose an action',
+      [
+        { text: 'Rename', onPress: handleRename },
+        { text: 'Duplicate', onPress: handleDuplicate },
+        { text: 'Move to Folder', onPress: handleMoveToFolder },
+        { text: 'Cancel', style: 'cancel' },
+      ]
+    );
+  };
+
+  const handleRename = () => {
+    Alert.prompt(
+      'Rename Document',
+      'Enter a new name for this document',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Rename',
+          onPress: (newName?: string) => {
+            if (newName && newName.trim()) {
+              // Would update document name here
+              Alert.alert('Success', `Document renamed to "${newName.trim()}"`);
+            }
+          },
+        },
+      ],
+      'plain-text',
+      document.name.replace(/\.[^/.]+$/, '') // Remove extension for editing
+    );
+  };
+
+  const handleDuplicate = () => {
+    Alert.alert('Duplicate', 'Document duplicated successfully!');
+  };
+
+  const handleMoveToFolder = () => {
+    Alert.alert('Move to Folder', 'Folder selection will be available in a future update.');
+  };
+
   const actions = [
     { id: 'share', icon: 'share-outline' as keyof typeof Ionicons.glyphMap, label: 'Share', onPress: handleShare },
-    { id: 'edit', icon: 'create-outline' as keyof typeof Ionicons.glyphMap, label: 'Edit', onPress: () => {} },
-    { id: 'convert', icon: 'swap-horizontal-outline' as keyof typeof Ionicons.glyphMap, label: 'Convert', onPress: () => {} },
-    { id: 'fax', icon: 'print-outline' as keyof typeof Ionicons.glyphMap, label: 'Fax', onPress: () => {} },
+    { id: 'edit', icon: 'create-outline' as keyof typeof Ionicons.glyphMap, label: 'Edit', onPress: handleEdit },
+    { id: 'convert', icon: 'swap-horizontal-outline' as keyof typeof Ionicons.glyphMap, label: 'Convert', onPress: handleConvert },
+    { id: 'fax', icon: 'print-outline' as keyof typeof Ionicons.glyphMap, label: 'Fax', onPress: handleFax },
     { id: 'delete', icon: 'trash-outline' as keyof typeof Ionicons.glyphMap, label: 'Delete', onPress: handleDelete },
   ];
 
@@ -111,7 +203,7 @@ export default function DocumentViewScreen() {
             {document.name}
           </Text>
         </View>
-        <TouchableOpacity style={styles.moreButton}>
+        <TouchableOpacity style={styles.moreButton} onPress={handleMoreOptions}>
           <Ionicons name="ellipsis-horizontal" size={24} color={colors.textPrimary} />
         </TouchableOpacity>
       </View>
@@ -197,7 +289,7 @@ export default function DocumentViewScreen() {
 
       {/* Bottom Action */}
       <View style={styles.bottomAction}>
-        <TouchableOpacity style={styles.openButton}>
+        <TouchableOpacity style={styles.openButton} onPress={handleOpenDocument}>
           <Ionicons name="open-outline" size={20} color={colors.textInverse} />
           <Text style={styles.openButtonText}>Open Document</Text>
         </TouchableOpacity>

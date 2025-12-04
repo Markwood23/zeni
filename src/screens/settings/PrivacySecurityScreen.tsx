@@ -7,6 +7,7 @@ import {
   ScrollView,
   Switch,
   Alert,
+  Linking,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
@@ -157,12 +158,18 @@ export default function PrivacySecurityScreen() {
         {/* Legal */}
         <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>LEGAL</Text>
         <View style={[styles.section, { backgroundColor: colors.surface }]}>
-          <TouchableOpacity style={[styles.actionItem, { borderBottomColor: colors.borderLight }]}>
+          <TouchableOpacity 
+            style={[styles.actionItem, { borderBottomColor: colors.borderLight }]}
+            onPress={() => Linking.openURL('https://zenigh.online/privacy.html')}
+          >
             <Text style={[styles.actionText, { color: colors.textPrimary }]}>Privacy Policy</Text>
             <Ionicons name="open-outline" size={18} color={colors.textTertiary} />
           </TouchableOpacity>
 
-          <TouchableOpacity style={[styles.actionItem, { borderBottomWidth: 0 }]}>
+          <TouchableOpacity 
+            style={[styles.actionItem, { borderBottomWidth: 0 }]}
+            onPress={() => Linking.openURL('https://zenigh.online/terms.html')}
+          >
             <Text style={[styles.actionText, { color: colors.textPrimary }]}>Terms of Service</Text>
             <Ionicons name="open-outline" size={18} color={colors.textTertiary} />
           </TouchableOpacity>

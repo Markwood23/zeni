@@ -13,9 +13,9 @@ export const accentColors = {
 // Light theme colors - Grayscale with accents
 export const lightColors = {
   // Primary colors (Blue for interactive elements)
-  primary: '#3A7CFF',
-  primaryLight: 'rgba(58, 124, 255, 0.08)',
-  primaryDark: '#2E63CC',
+  primary: '#017DE9',
+  primaryLight: 'rgba(1, 125, 233, 0.08)',
+  primaryDark: '#0165BB',
   
   // Accent color for highlights
   accent: '#FF5722',
@@ -63,9 +63,9 @@ export const lightColors = {
 // Dark theme colors - Grayscale with accents
 export const darkColors = {
   // Primary colors (Blue for interactive elements)
-  primary: '#5A94FF',
-  primaryLight: 'rgba(90, 148, 255, 0.12)',
-  primaryDark: '#3A7CFF',
+  primary: '#2E9BFF',
+  primaryLight: 'rgba(46, 155, 255, 0.15)',
+  primaryDark: '#017DE9',
   
   // Accent color for highlights
   accent: '#FF7043',

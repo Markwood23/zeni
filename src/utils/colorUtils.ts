@@ -261,7 +261,7 @@ export function generateColorVariants(primaryColor: string, isDark: boolean = fa
  * Preset color options for the color picker
  */
 export const PRESET_COLORS = [
-  { name: 'Blue', color: '#3A7CFF' },
+  { name: 'Blue', color: '#017DE9' },
   { name: 'Purple', color: '#8B5CF6' },
   { name: 'Pink', color: '#EC4899' },
   { name: 'Rose', color: '#F43F5E' },

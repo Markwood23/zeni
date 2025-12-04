@@ -8,15 +8,18 @@ import {
   TextInput,
   Dimensions,
   RefreshControl,
+  Alert,
+  Share,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
+import { useNavigation, useRoute, RouteProp, CommonActions } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Ionicons } from '@expo/vector-icons';
 import { spacing, borderRadius, typography } from '../../constants/theme';
 import { useTheme } from '../../context/ThemeContext';
 import { DocumentsStackParamList, Document, DocumentFilter } from '../../types';
 import { useDocumentsStore } from '../../store';
+import DocumentThumbnail from '../../components/DocumentThumbnail';
 
 type NavigationProp = NativeStackNavigationProp<DocumentsStackParamList, 'AllDocuments'>;
 type AllDocumentsRouteProp = RouteProp<DocumentsStackParamList, 'AllDocuments'>;
@@ -45,7 +48,7 @@ export default function AllDocumentsScreen() {
   const navigation = useNavigation<NavigationProp>();
   const route = useRoute<AllDocumentsRouteProp>();
   const { documents } = useDocumentsStore();
-  const { colors } = useTheme();
+  const { colors, isDark } = useTheme();
   
   const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
   const [searchQuery, setSearchQuery] = useState('');
@@ -91,6 +94,90 @@ export default function AllDocumentsScreen() {
     
     return docs;
   }, [documents, selectedFilter, searchQuery, sortBy]);
+
+  const { deleteDocument } = useDocumentsStore();
+
+  const handleDocumentActions = (doc: Document) => {
+    Alert.alert(
+      doc.name,
+      'Choose an action',
+      [
+        {
+          text: 'Share',
+          onPress: async () => {
+            try {
+              await Share.share({
+                message: `Check out this document: ${doc.name}`,
+              });
+            } catch (error) {
+              console.error('Error sharing:', error);
+            }
+          },
+        },
+        {
+          text: 'Edit',
+          onPress: () => {
+            navigation.dispatch(
+              CommonActions.navigate({
+                name: 'Home',
+                params: {
+                  screen: 'EditDocument',
+                  params: { documentId: doc.id },
+                },
+              })
+            );
+          },
+        },
+        {
+          text: 'Convert',
+          onPress: () => {
+            navigation.dispatch(
+              CommonActions.navigate({
+                name: 'Home',
+                params: {
+                  screen: 'Convert',
+                  params: { documentId: doc.id },
+                },
+              })
+            );
+          },
+        },
+        {
+          text: 'Fax',
+          onPress: () => {
+            navigation.dispatch(
+              CommonActions.navigate({
+                name: 'Home',
+                params: {
+                  screen: 'FaxSend',
+                  params: { documentId: doc.id },
+                },
+              })
+            );
+          },
+        },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: () => {
+            Alert.alert(
+              'Delete Document',
+              `Are you sure you want to delete "${doc.name}"?`,
+              [
+                { text: 'Cancel', style: 'cancel' },
+                {
+                  text: 'Delete',
+                  style: 'destructive',
+                  onPress: () => deleteDocument(doc.id),
+                },
+              ]
+            );
+          },
+        },
+        { text: 'Cancel', style: 'cancel' },
+      ]
+    );
+  };
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
@@ -139,13 +226,13 @@ export default function AllDocumentsScreen() {
   const getTypeColor = (type: string) => {
     switch (type) {
       case 'scanned':
-        return colors?.scanIcon || colors?.primary || '#3A7CFF';
+        return colors?.scanIcon || colors?.primary || '#017DE9';
       case 'edited':
-        return colors?.editIcon || colors?.primary || '#3A7CFF';
+        return colors?.editIcon || colors?.primary || '#017DE9';
       case 'faxed':
-        return colors?.convertIcon || colors?.primary || '#3A7CFF';
+        return colors?.convertIcon || colors?.primary || '#017DE9';
       default:
-        return colors?.primary || '#3A7CFF';
+        return colors?.primary || '#017DE9';
     }
   };
 
@@ -154,23 +241,12 @@ export default function AllDocumentsScreen() {
       style={[styles.documentCard, { backgroundColor: colors.surface }]}
       onPress={() => navigation.navigate('DocumentView', { documentId: item.id })}
     >
-      <View style={[styles.documentThumbnail, { backgroundColor: colors.surfaceSecondary }]}>
-        <View style={[styles.thumbnailInner, { backgroundColor: '#fff' }]}>
-          <View style={styles.thumbnailHeader}>
-            <Ionicons
-              name={getDocumentIcon(item.type)}
-              size={14}
-              color={getTypeColor(item.type)}
-            />
-          </View>
-          <View style={styles.thumbnailLines}>
-            <View style={[styles.thumbnailLine, { backgroundColor: colors.border, width: '80%' }]} />
-            <View style={[styles.thumbnailLine, { backgroundColor: colors.border, width: '90%' }]} />
-            <View style={[styles.thumbnailLine, { backgroundColor: colors.border, width: '70%' }]} />
-            <View style={[styles.thumbnailLine, { backgroundColor: colors.border, width: '85%' }]} />
-          </View>
-        </View>
-      </View>
+      <DocumentThumbnail 
+        type={item.type as any}
+        thumbnailPath={item.thumbnailPath}
+        size="medium"
+        iconColor={getTypeColor(item.type)}
+      />
       <View style={styles.documentInfo}>
         <Text style={[styles.documentName, { color: colors.textPrimary }]} numberOfLines={1}>
           {item.name}
@@ -189,7 +265,7 @@ export default function AllDocumentsScreen() {
           {item.pagesCount} {item.pagesCount === 1 ? 'page' : 'pages'} • {formatFileSize(item.fileSize)}
         </Text>
       </View>
-      <TouchableOpacity style={styles.moreButton}>
+      <TouchableOpacity style={styles.moreButton} onPress={() => handleDocumentActions(item)}>
         <Ionicons name="ellipsis-vertical" size={20} color={colors.textTertiary} />
       </TouchableOpacity>
     </TouchableOpacity>
@@ -200,23 +276,13 @@ export default function AllDocumentsScreen() {
       style={[styles.gridCard, { backgroundColor: colors.surface }]}
       onPress={() => navigation.navigate('DocumentView', { documentId: item.id })}
     >
-      <View style={[styles.gridThumbnail, { backgroundColor: colors.surfaceSecondary }]}>
-        <View style={[styles.gridThumbnailInner, { backgroundColor: '#fff' }]}>
-          <View style={styles.gridThumbnailHeader}>
-            <Ionicons
-              name={getDocumentIcon(item.type)}
-              size={18}
-              color={getTypeColor(item.type)}
-            />
-          </View>
-          <View style={styles.gridThumbnailLines}>
-            <View style={[styles.thumbnailLine, { backgroundColor: colors.border, width: '80%' }]} />
-            <View style={[styles.thumbnailLine, { backgroundColor: colors.border, width: '90%' }]} />
-            <View style={[styles.thumbnailLine, { backgroundColor: colors.border, width: '70%' }]} />
-            <View style={[styles.thumbnailLine, { backgroundColor: colors.border, width: '85%' }]} />
-            <View style={[styles.thumbnailLine, { backgroundColor: colors.border, width: '75%' }]} />
-          </View>
-        </View>
+      <View style={[styles.gridThumbnailContainer, { backgroundColor: colors.surfaceSecondary }]}>
+        <DocumentThumbnail 
+          type={item.type as any}
+          thumbnailPath={item.thumbnailPath}
+          size="large"
+          iconColor={getTypeColor(item.type)}
+        />
       </View>
       <View style={styles.gridInfo}>
         <Text style={[styles.gridName, { color: colors.textPrimary }]} numberOfLines={2}>
@@ -299,6 +365,7 @@ export default function AllDocumentsScreen() {
           placeholderTextColor={colors.textTertiary}
           value={searchQuery}
           onChangeText={setSearchQuery}
+          keyboardAppearance={isDark ? 'dark' : 'light'}
         />
         {searchQuery ? (
           <TouchableOpacity onPress={() => setSearchQuery('')}>
@@ -558,30 +625,9 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 2,
   },
-  documentThumbnail: {
-    width: 56,
-    height: 72,
-    borderRadius: borderRadius.sm,
-    marginRight: spacing.md,
-    overflow: 'hidden',
-  },
-  thumbnailInner: {
-    flex: 1,
-    padding: spacing.xs,
-  },
-  thumbnailHeader: {
-    marginBottom: spacing.xs,
-  },
-  thumbnailLines: {
-    flex: 1,
-    gap: 3,
-  },
-  thumbnailLine: {
-    height: 4,
-    borderRadius: 2,
-  },
   documentInfo: {
     flex: 1,
+    marginLeft: spacing.md,
   },
   documentName: {
     fontSize: typography.fontSize.md,
@@ -634,21 +680,13 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 2,
   },
-  gridThumbnail: {
+  gridThumbnailContainer: {
     width: '100%',
-    aspectRatio: 0.75,
+    aspectRatio: 0.85,
+    justifyContent: 'center',
+    alignItems: 'center',
     borderBottomWidth: 1,
-  },
-  gridThumbnailInner: {
-    flex: 1,
-    padding: spacing.md,
-  },
-  gridThumbnailHeader: {
-    marginBottom: spacing.sm,
-  },
-  gridThumbnailLines: {
-    flex: 1,
-    gap: 4,
+    borderBottomColor: 'rgba(0,0,0,0.08)',
   },
   gridInfo: {
     padding: spacing.md,

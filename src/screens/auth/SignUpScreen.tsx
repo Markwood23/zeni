@@ -22,7 +22,7 @@ type NavigationProp = NativeStackNavigationProp<AuthStackParamList, 'SignUp'>;
 
 export default function SignUpScreen() {
   const navigation = useNavigation<NavigationProp>();
-  const { colors } = useTheme();
+  const { colors, isDark } = useTheme();
   const styles = createStyles(colors);
   const { setUser } = useUserStore();
   const [firstName, setFirstName] = useState('');
@@ -85,6 +85,7 @@ export default function SignUpScreen() {
                   value={firstName}
                   onChangeText={setFirstName}
                   autoCapitalize="words"
+                  keyboardAppearance={isDark ? 'dark' : 'light'}
                 />
               </View>
             </View>
@@ -101,6 +102,7 @@ export default function SignUpScreen() {
                   onChangeText={setEmail}
                   autoCapitalize="none"
                   keyboardType="email-address"
+                  keyboardAppearance={isDark ? 'dark' : 'light'}
                 />
               </View>
             </View>
@@ -116,6 +118,7 @@ export default function SignUpScreen() {
                   value={password}
                   onChangeText={setPassword}
                   secureTextEntry={!showPassword}
+                  keyboardAppearance={isDark ? 'dark' : 'light'}
                 />
                 <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
                   <Ionicons
@@ -138,6 +141,7 @@ export default function SignUpScreen() {
                   value={school}
                   onChangeText={setSchool}
                   autoCapitalize="words"
+                  keyboardAppearance={isDark ? 'dark' : 'light'}
                 />
               </View>
             </View>

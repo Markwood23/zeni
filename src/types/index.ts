@@ -106,6 +106,32 @@ export interface Activity {
   createdAt: Date;
 }
 
+// App Notification types
+export type NotificationType = 
+  | 'fax_sent' 
+  | 'fax_delivered' 
+  | 'fax_failed'
+  | 'scan_complete'
+  | 'convert_complete'
+  | 'ai_complete'
+  | 'document_shared'
+  | 'storage_warning'
+  | 'tip'
+  | 'update'
+  | 'welcome';
+
+export interface AppNotification {
+  id: string;
+  type: NotificationType;
+  title: string;
+  message: string;
+  isRead: boolean;
+  documentId?: string;
+  actionLabel?: string;
+  actionRoute?: string;
+  createdAt: Date;
+}
+
 // Navigation types
 export type RootStackParamList = {
   Onboarding: undefined;
@@ -140,6 +166,11 @@ export type HomeStackParamList = {
   AIChat: { conversationId?: string; documentId?: string };
   Fax: { documentId?: string };
   FaxSend: { documentId: string };
+  AllDocuments: { initialFilter?: DocumentFilter } | undefined;
+  DocumentView: { documentId: string };
+  NotificationCenter: undefined;
+  NotificationDetail: { notificationId: string };
+  HelpSupport: undefined;
 };
 
 export type DocumentsStackParamList = {

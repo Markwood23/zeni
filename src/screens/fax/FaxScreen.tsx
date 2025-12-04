@@ -207,7 +207,7 @@ export default function FaxScreen() {
               <View style={styles.historySection}>
                 <View style={styles.sectionHeader}>
                   <Text style={styles.sectionTitle}>Recent Faxes</Text>
-                  <TouchableOpacity onPress={() => navigation.getParent()?.navigate('Documents', { screen: 'AllDocuments', params: { initialFilter: 'faxed' } })}>
+                  <TouchableOpacity onPress={() => navigation.navigate('AllDocuments', { initialFilter: 'faxed' } as any)}>
                     <Text style={styles.viewAllText}>View All</Text>
                   </TouchableOpacity>
                 </View>

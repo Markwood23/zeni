@@ -22,7 +22,7 @@ type NavigationProp = NativeStackNavigationProp<AuthStackParamList, 'SignIn'>;
 
 export default function SignInScreen() {
   const navigation = useNavigation<NavigationProp>();
-  const { colors } = useTheme();
+  const { colors, isDark } = useTheme();
   const styles = createStyles(colors);
   const { setUser } = useUserStore();
   const [email, setEmail] = useState('');
@@ -81,6 +81,7 @@ export default function SignInScreen() {
                   onChangeText={setEmail}
                   autoCapitalize="none"
                   keyboardType="email-address"
+                  keyboardAppearance={isDark ? 'dark' : 'light'}
                 />
               </View>
             </View>
@@ -96,6 +97,7 @@ export default function SignInScreen() {
                   value={password}
                   onChangeText={setPassword}
                   secureTextEntry={!showPassword}
+                  keyboardAppearance={isDark ? 'dark' : 'light'}
                 />
                 <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
                   <Ionicons

@@ -141,7 +141,7 @@ export default function AboutScreen() {
         <View style={[styles.section, { backgroundColor: colors.surface }]}>
           <TouchableOpacity 
             style={[styles.linkItem, { borderBottomColor: colors.borderLight }]}
-            onPress={() => Linking.openURL('https://zeniapp.com')}
+            onPress={() => Linking.openURL('https://zenigh.online')}
           >
             <Text style={[styles.linkText, { color: colors.textPrimary }]}>Website</Text>
             <Ionicons name="open-outline" size={18} color={colors.textTertiary} />
@@ -149,7 +149,7 @@ export default function AboutScreen() {
 
           <TouchableOpacity 
             style={[styles.linkItem, { borderBottomColor: colors.borderLight }]}
-            onPress={() => Linking.openURL('https://zeniapp.com/privacy')}
+            onPress={() => Linking.openURL('https://zenigh.online/privacy.html')}
           >
             <Text style={[styles.linkText, { color: colors.textPrimary }]}>Privacy Policy</Text>
             <Ionicons name="open-outline" size={18} color={colors.textTertiary} />
@@ -157,7 +157,7 @@ export default function AboutScreen() {
 
           <TouchableOpacity 
             style={[styles.linkItem, { borderBottomColor: colors.borderLight }]}
-            onPress={() => Linking.openURL('https://zeniapp.com/terms')}
+            onPress={() => Linking.openURL('https://zenigh.online/terms.html')}
           >
             <Text style={[styles.linkText, { color: colors.textPrimary }]}>Terms of Service</Text>
             <Ionicons name="open-outline" size={18} color={colors.textTertiary} />

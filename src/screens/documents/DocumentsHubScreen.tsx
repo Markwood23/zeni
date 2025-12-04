@@ -8,15 +8,17 @@ import {
   Dimensions,
   TextInput,
   Alert,
+  Share,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
+import { useNavigation, useRoute, RouteProp, CommonActions } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Ionicons } from '@expo/vector-icons';
 import { spacing, borderRadius, typography } from '../../constants/theme';
 import { useTheme } from '../../context/ThemeContext';
 import { DocumentsStackParamList, Document, DocumentFilter, Folder } from '../../types';
 import { useDocumentsStore, generateId, useUserStore } from '../../store';
+import DocumentThumbnail from '../../components/DocumentThumbnail';
 
 type NavigationProp = NativeStackNavigationProp<DocumentsStackParamList, 'DocumentsHub'>;
 type DocumentsHubRouteProp = RouteProp<DocumentsStackParamList, 'DocumentsHub'>;
@@ -35,12 +37,12 @@ const filters: { key: DocumentFilter; label: string }[] = [
 export default function DocumentsHubScreen() {
   const navigation = useNavigation<NavigationProp>();
   const route = useRoute<DocumentsHubRouteProp>();
-  const { documents, folders, selectedFilter, setFilter, addFolder } = useDocumentsStore();
+  const { documents, folders, selectedFilter, setFilter, addFolder, deleteDocument } = useDocumentsStore();
   const { user } = useUserStore();
   const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearching, setIsSearching] = useState(false);
-  const { colors } = useTheme();
+  const { colors, isDark } = useTheme();
   const styles = createStyles(colors);
 
   // Auto-open search when navigated with openSearch param
@@ -52,13 +54,13 @@ export default function DocumentsHubScreen() {
 
   // Filter documents by type and search query
   const filteredDocuments = useMemo(() => {
-    let docs = selectedFilter === 'all'
+    let docs: Document[] = selectedFilter === 'all'
       ? documents
-      : documents.filter((d) => d.type === selectedFilter);
+      : documents.filter((d: Document) => d.type === selectedFilter);
     
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
-      docs = docs.filter((d) => 
+      docs = docs.filter((d: Document) => 
         d.name.toLowerCase().includes(query)
       );
     }
@@ -68,7 +70,7 @@ export default function DocumentsHubScreen() {
 
   // Get folder with document count
   const foldersWithCount = useMemo(() => {
-    return folders.map((folder) => ({
+    return folders.map((folder: Folder) => ({
       ...folder,
       count: folder.documentIds.length,
     }));
@@ -133,28 +135,98 @@ export default function DocumentsHubScreen() {
     }
   };
 
+  const handleDocumentActions = (doc: Document) => {
+    Alert.alert(
+      doc.name,
+      'Choose an action',
+      [
+        {
+          text: 'Share',
+          onPress: async () => {
+            try {
+              await Share.share({
+                message: `Check out this document: ${doc.name}`,
+              });
+            } catch (error) {
+              console.error('Error sharing:', error);
+            }
+          },
+        },
+        {
+          text: 'Edit',
+          onPress: () => {
+            navigation.dispatch(
+              CommonActions.navigate({
+                name: 'Home',
+                params: {
+                  screen: 'EditDocument',
+                  params: { documentId: doc.id },
+                },
+              })
+            );
+          },
+        },
+        {
+          text: 'Convert',
+          onPress: () => {
+            navigation.dispatch(
+              CommonActions.navigate({
+                name: 'Home',
+                params: {
+                  screen: 'Convert',
+                  params: { documentId: doc.id },
+                },
+              })
+            );
+          },
+        },
+        {
+          text: 'Fax',
+          onPress: () => {
+            navigation.dispatch(
+              CommonActions.navigate({
+                name: 'Home',
+                params: {
+                  screen: 'FaxSend',
+                  params: { documentId: doc.id },
+                },
+              })
+            );
+          },
+        },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: () => {
+            Alert.alert(
+              'Delete Document',
+              `Are you sure you want to delete "${doc.name}"?`,
+              [
+                { text: 'Cancel', style: 'cancel' },
+                {
+                  text: 'Delete',
+                  style: 'destructive',
+                  onPress: () => deleteDocument(doc.id),
+                },
+              ]
+            );
+          },
+        },
+        { text: 'Cancel', style: 'cancel' },
+      ]
+    );
+  };
+
   const renderDocumentItem = ({ item }: { item: Document }) => (
     <TouchableOpacity
       style={styles.documentCard}
       onPress={() => navigation.navigate('DocumentView', { documentId: item.id })}
     >
-      <View style={styles.documentThumbnail}>
-        <View style={styles.thumbnailInner}>
-          <View style={styles.thumbnailHeader}>
-            <Ionicons
-              name={getDocumentIcon(item.type)}
-              size={14}
-              color={colors.textSecondary}
-            />
-          </View>
-          <View style={styles.thumbnailLines}>
-            <View style={[styles.thumbnailLine, { width: '80%' }]} />
-            <View style={[styles.thumbnailLine, { width: '90%' }]} />
-            <View style={[styles.thumbnailLine, { width: '70%' }]} />
-            <View style={[styles.thumbnailLine, { width: '85%' }]} />
-          </View>
-        </View>
-      </View>
+      <DocumentThumbnail 
+        type={item.type as any}
+        thumbnailPath={item.thumbnailPath}
+        size="medium"
+      />
       <View style={styles.documentInfo}>
         <Text style={styles.documentName} numberOfLines={1}>
           {item.name}
@@ -163,7 +235,7 @@ export default function DocumentsHubScreen() {
           {formatDate(item.createdAt)} • {item.pagesCount} pages • {formatFileSize(item.fileSize)}
         </Text>
       </View>
-      <TouchableOpacity style={styles.moreButton}>
+      <TouchableOpacity style={styles.moreButton} onPress={() => handleDocumentActions(item)}>
         <Ionicons name="ellipsis-vertical" size={20} color={colors.textTertiary} />
       </TouchableOpacity>
     </TouchableOpacity>
@@ -175,23 +247,12 @@ export default function DocumentsHubScreen() {
       style={styles.gridCard}
       onPress={() => navigation.navigate('DocumentView', { documentId: item.id })}
     >
-      <View style={styles.gridThumbnail}>
-        <View style={styles.gridThumbnailInner}>
-          <View style={styles.gridThumbnailHeader}>
-            <Ionicons
-              name={getDocumentIcon(item.type)}
-              size={18}
-              color={colors.textSecondary}
-            />
-          </View>
-          <View style={styles.gridThumbnailLines}>
-            <View style={[styles.thumbnailLine, { width: '80%' }]} />
-            <View style={[styles.thumbnailLine, { width: '90%' }]} />
-            <View style={[styles.thumbnailLine, { width: '70%' }]} />
-            <View style={[styles.thumbnailLine, { width: '85%' }]} />
-            <View style={[styles.thumbnailLine, { width: '75%' }]} />
-          </View>
-        </View>
+      <View style={styles.gridThumbnailContainer}>
+        <DocumentThumbnail 
+          type={item.type as any}
+          thumbnailPath={item.thumbnailPath}
+          size="large"
+        />
       </View>
       <View style={styles.gridInfo}>
         <Text style={styles.gridName} numberOfLines={2}>
@@ -252,6 +313,7 @@ export default function DocumentsHubScreen() {
               value={searchQuery}
               onChangeText={setSearchQuery}
               autoFocus
+              keyboardAppearance={isDark ? 'dark' : 'light'}
             />
             <TouchableOpacity 
               onPress={() => {
@@ -516,34 +578,9 @@ const createStyles = (colors: any) => StyleSheet.create({
     shadowRadius: 4,
     elevation: 2,
   },
-  documentThumbnail: {
-    width: 56,
-    height: 72,
-    borderRadius: borderRadius.sm,
-    backgroundColor: colors.surface,
-    marginRight: spacing.md,
-    borderWidth: 1,
-    borderColor: colors.borderLight,
-    overflow: 'hidden',
-  },
-  thumbnailInner: {
-    flex: 1,
-    padding: spacing.xs,
-  },
-  thumbnailHeader: {
-    marginBottom: spacing.xs,
-  },
-  thumbnailLines: {
-    flex: 1,
-    gap: 3,
-  },
-  thumbnailLine: {
-    height: 4,
-    backgroundColor: colors.surfaceSecondary,
-    borderRadius: 2,
-  },
   documentInfo: {
     flex: 1,
+    marginLeft: spacing.md,
   },
   documentName: {
     fontSize: typography.fontSize.md,
@@ -608,23 +645,13 @@ const createStyles = (colors: any) => StyleSheet.create({
     shadowRadius: 4,
     elevation: 2,
   },
-  gridThumbnail: {
+  gridThumbnailContainer: {
     width: '100%',
-    aspectRatio: 0.75,
-    backgroundColor: colors.surface,
+    aspectRatio: 0.85,
+    justifyContent: 'center',
+    alignItems: 'center',
     borderBottomWidth: 1,
     borderBottomColor: colors.borderLight,
-  },
-  gridThumbnailInner: {
-    flex: 1,
-    padding: spacing.md,
-  },
-  gridThumbnailHeader: {
-    marginBottom: spacing.sm,
-  },
-  gridThumbnailLines: {
-    flex: 1,
-    gap: 4,
   },
   gridInfo: {
     padding: spacing.md,

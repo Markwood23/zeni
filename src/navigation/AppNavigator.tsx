@@ -27,6 +27,8 @@ import AskAIScreen from '../screens/ai/AskAIScreen';
 import AIChatScreen from '../screens/ai/AIChatScreen';
 import FaxScreen from '../screens/fax/FaxScreen';
 import FaxSendScreen from '../screens/fax/FaxSendScreen';
+import NotificationCenterScreen from '../screens/notifications/NotificationCenterScreen';
+import NotificationDetailScreen from '../screens/notifications/NotificationDetailScreen';
 
 // Settings Screens
 import AccountSettingsScreen from '../screens/settings/AccountSettingsScreen';
@@ -87,6 +89,11 @@ function HomeNavigator() {
       <HomeStack.Screen name="AIChat" component={AIChatScreen} />
       <HomeStack.Screen name="Fax" component={FaxScreen} />
       <HomeStack.Screen name="FaxSend" component={FaxSendScreen} />
+      <HomeStack.Screen name="AllDocuments" component={AllDocumentsScreen} />
+      <HomeStack.Screen name="DocumentView" component={DocumentViewScreen} />
+      <HomeStack.Screen name="NotificationCenter" component={NotificationCenterScreen} />
+      <HomeStack.Screen name="NotificationDetail" component={NotificationDetailScreen} />
+      <HomeStack.Screen name="HelpSupport" component={HelpSupportScreen} />
     </HomeStack.Navigator>
   );
 }

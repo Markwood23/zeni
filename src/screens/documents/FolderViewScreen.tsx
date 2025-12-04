@@ -18,6 +18,7 @@ import { spacing, borderRadius, typography } from '../../constants/theme';
 import { useTheme } from '../../context/ThemeContext';
 import { DocumentsStackParamList, Document } from '../../types';
 import { useDocumentsStore } from '../../store';
+import DocumentThumbnail from '../../components/DocumentThumbnail';
 
 type NavigationProp = NativeStackNavigationProp<DocumentsStackParamList, 'FolderView'>;
 type FolderViewRouteProp = RouteProp<DocumentsStackParamList, 'FolderView'>;
@@ -37,7 +38,7 @@ const FOLDER_EMOJIS = [
 
 // Color options for folder backgrounds
 const FOLDER_COLORS = [
-  { name: 'Blue', value: '#3A7CFF', light: 'rgba(58, 124, 255, 0.12)' },
+  { name: 'Blue', value: '#017DE9', light: 'rgba(1, 125, 233, 0.12)' },
   { name: 'Purple', value: '#7C4DFF', light: 'rgba(124, 77, 255, 0.12)' },
   { name: 'Pink', value: '#E91E63', light: 'rgba(233, 30, 99, 0.12)' },
   { name: 'Red', value: '#F44336', light: 'rgba(244, 67, 54, 0.12)' },
@@ -219,23 +220,11 @@ export default function FolderViewScreen() {
       style={[styles.documentCard, { backgroundColor: colors.surface }]}
       onPress={() => navigation.navigate('DocumentView', { documentId: item.id })}
     >
-      <View style={[styles.documentThumbnail, { backgroundColor: colors.surfaceSecondary }]}>
-        <View style={[styles.thumbnailInner, { backgroundColor: '#fff' }]}>
-          <View style={styles.thumbnailHeader}>
-            <Ionicons
-              name={getDocumentIcon(item.type)}
-              size={14}
-              color={colors.textSecondary}
-            />
-          </View>
-          <View style={styles.thumbnailLines}>
-            <View style={[styles.thumbnailLine, { backgroundColor: colors.border, width: '80%' }]} />
-            <View style={[styles.thumbnailLine, { backgroundColor: colors.border, width: '90%' }]} />
-            <View style={[styles.thumbnailLine, { backgroundColor: colors.border, width: '70%' }]} />
-            <View style={[styles.thumbnailLine, { backgroundColor: colors.border, width: '85%' }]} />
-          </View>
-        </View>
-      </View>
+      <DocumentThumbnail 
+        type={item.type as any}
+        thumbnailPath={item.thumbnailPath}
+        size="medium"
+      />
       <View style={styles.documentInfo}>
         <Text style={[styles.documentName, { color: colors.textPrimary }]} numberOfLines={1}>
           {item.name}
@@ -255,23 +244,12 @@ export default function FolderViewScreen() {
       style={[styles.gridCard, { backgroundColor: colors.surface }]}
       onPress={() => navigation.navigate('DocumentView', { documentId: item.id })}
     >
-      <View style={[styles.gridThumbnail, { backgroundColor: colors.surfaceSecondary }]}>
-        <View style={[styles.gridThumbnailInner, { backgroundColor: '#fff' }]}>
-          <View style={styles.gridThumbnailHeader}>
-            <Ionicons
-              name={getDocumentIcon(item.type)}
-              size={18}
-              color={colors.textSecondary}
-            />
-          </View>
-          <View style={styles.gridThumbnailLines}>
-            <View style={[styles.thumbnailLine, { backgroundColor: colors.border, width: '80%' }]} />
-            <View style={[styles.thumbnailLine, { backgroundColor: colors.border, width: '90%' }]} />
-            <View style={[styles.thumbnailLine, { backgroundColor: colors.border, width: '70%' }]} />
-            <View style={[styles.thumbnailLine, { backgroundColor: colors.border, width: '85%' }]} />
-            <View style={[styles.thumbnailLine, { backgroundColor: colors.border, width: '75%' }]} />
-          </View>
-        </View>
+      <View style={[styles.gridThumbnailContainer, { backgroundColor: colors.surfaceSecondary }]}>
+        <DocumentThumbnail 
+          type={item.type as any}
+          thumbnailPath={item.thumbnailPath}
+          size="large"
+        />
       </View>
       <View style={styles.gridInfo}>
         <Text style={[styles.gridName, { color: colors.textPrimary }]} numberOfLines={2}>
@@ -559,37 +537,9 @@ const styles = StyleSheet.create({
     borderRadius: borderRadius.lg,
     marginBottom: spacing.sm,
   },
-  documentThumbnail: {
-    width: 56,
-    height: 72,
-    borderRadius: borderRadius.md,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: spacing.md,
-  },
-  thumbnailInner: {
-    width: '85%',
-    height: '90%',
-    borderRadius: 4,
-    padding: 6,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 1,
-  },
-  thumbnailHeader: {
-    marginBottom: 6,
-  },
-  thumbnailLines: {
-    gap: 3,
-  },
-  thumbnailLine: {
-    height: 3,
-    borderRadius: 1.5,
-  },
   documentInfo: {
     flex: 1,
+    marginLeft: spacing.md,
   },
   documentName: {
     fontSize: typography.fontSize.md,
@@ -605,30 +555,13 @@ const styles = StyleSheet.create({
     padding: spacing.md,
     marginBottom: spacing.sm,
   },
-  gridThumbnail: {
+  gridThumbnailContainer: {
     width: '100%',
     height: 120,
     borderRadius: borderRadius.md,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: spacing.sm,
-  },
-  gridThumbnailInner: {
-    width: '75%',
-    height: '85%',
-    borderRadius: 4,
-    padding: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 1,
-  },
-  gridThumbnailHeader: {
-    marginBottom: 8,
-  },
-  gridThumbnailLines: {
-    gap: 4,
   },
   gridInfo: {
     paddingHorizontal: spacing.xs,

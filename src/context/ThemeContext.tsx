@@ -23,7 +23,7 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 const THEME_STORAGE_KEY = '@zeni_theme_mode';
 const PRIMARY_COLOR_KEY = '@zeni_primary_color';
 const COLOR_PICKER_SEEN_KEY = '@zeni_color_picker_seen';
-const DEFAULT_PRIMARY_COLOR = '#3A7CFF';
+const DEFAULT_PRIMARY_COLOR = '#017DE9';
 
 interface ThemeProviderProps {
   children: ReactNode;

@@ -15,11 +15,12 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Ionicons } from '@expo/vector-icons';
 import { spacing, borderRadius, typography, shadows } from '../../constants/theme';
 import { useTheme } from '../../context/ThemeContext';
-import { HomeStackParamList, DocumentsStackParamList } from '../../types';
-import { useUserStore, useDocumentsStore } from '../../store';
+import { HomeStackParamList, DocumentsStackParamList, Document } from '../../types';
+import { useUserStore, useDocumentsStore, useNotificationsStore } from '../../store';
 import { CompositeNavigationProp } from '@react-navigation/native';
 import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import { MainTabParamList } from '../../types';
+import DocumentThumbnail from '../../components/DocumentThumbnail';
 
 type NavigationProp = CompositeNavigationProp<
   NativeStackNavigationProp<HomeStackParamList, 'HomeScreen'>,
@@ -105,6 +106,7 @@ export default function HomeScreen() {
   const navigation = useNavigation<NavigationProp>();
   const { user } = useUserStore();
   const { documents } = useDocumentsStore();
+  const { unreadCount } = useNotificationsStore();
   const { colors, isDark } = useTheme();
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -117,7 +119,7 @@ export default function HomeScreen() {
       return docs.slice(0, 3); // Show only 3 when not searching
     }
     const query = searchQuery.toLowerCase();
-    return docs.filter(d => 
+    return docs.filter((d: Document) => 
       d.name.toLowerCase().includes(query) || 
       d.type.toLowerCase().includes(query)
     );
@@ -145,16 +147,26 @@ export default function HomeScreen() {
         {/* Header */}
         <View style={styles.header}>
           <View style={styles.headerLeft}>
-            <TouchableOpacity style={styles.helpButton}>
+            <TouchableOpacity 
+              style={styles.helpButton}
+              onPress={() => navigation.navigate('HelpSupport' as any)}
+            >
               <Ionicons name="help-circle-outline" size={28} color={colors.textSecondary} />
             </TouchableOpacity>
           </View>
           <View style={styles.headerRight}>
-            <TouchableOpacity style={styles.notificationButton}>
+            <TouchableOpacity 
+              style={styles.notificationButton}
+              onPress={() => navigation.navigate('NotificationCenter' as any)}
+            >
               <Ionicons name="notifications-outline" size={24} color={colors.textSecondary} />
-              <View style={[styles.notificationBadge, { backgroundColor: colors.primary }]}>
-                <Text style={[styles.badgeText, { color: colors.textInverse }]}>5</Text>
-              </View>
+              {unreadCount > 0 && (
+                <View style={[styles.notificationBadge, { backgroundColor: colors.primary }]}>
+                  <Text style={[styles.badgeText, { color: colors.textInverse }]}>
+                    {unreadCount > 9 ? '9+' : unreadCount}
+                  </Text>
+                </View>
+              )}
             </TouchableOpacity>
           </View>
         </View>
@@ -218,6 +230,7 @@ export default function HomeScreen() {
             placeholderTextColor={colors.textTertiary}
             value={searchQuery}
             onChangeText={setSearchQuery}
+            keyboardAppearance={isDark ? 'dark' : 'light'}
           />
           {searchQuery ? (
             <TouchableOpacity onPress={() => setSearchQuery('')} style={styles.searchMic}>
@@ -237,7 +250,7 @@ export default function HomeScreen() {
               <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>
                 {searchQuery ? `Results (${filteredDocs.length})` : 'Recent Files'}
               </Text>
-              <TouchableOpacity onPress={() => navigation.navigate('Documents', { screen: 'AllDocuments' } as any)}>
+              <TouchableOpacity onPress={() => navigation.navigate('AllDocuments' as any)}>
                 <Text style={[styles.viewAllText, { color: colors.primary }]}>View All</Text>
               </TouchableOpacity>
             </View>
@@ -266,23 +279,18 @@ export default function HomeScreen() {
                 showsHorizontalScrollIndicator={false}
                 contentContainerStyle={styles.recentList}
               >
-                {filteredDocs.map((doc) => (
+                {filteredDocs.map((doc: Document) => (
                   <TouchableOpacity 
                     key={doc.id} 
                     style={[styles.recentCard, { backgroundColor: colors.surface }]}
                     onPress={() => navigation.navigate('Documents', { screen: 'DocumentView', params: { documentId: doc.id } } as any)}
                   >
-                    <View style={[styles.recentCardThumbnail, { backgroundColor: colors.surfaceSecondary }]}>
-                      <View style={styles.thumbnailDoc}>
-                        <View style={styles.thumbnailDocHeader}>
-                          <Ionicons name="document-text" size={12} color={colors.textSecondary} />
-                        </View>
-                        <View style={styles.thumbnailDocLines}>
-                          <View style={[styles.thumbnailDocLine, { backgroundColor: colors.border, width: '80%' }]} />
-                          <View style={[styles.thumbnailDocLine, { backgroundColor: colors.border, width: '90%' }]} />
-                          <View style={[styles.thumbnailDocLine, { backgroundColor: colors.border, width: '60%' }]} />
-                        </View>
-                      </View>
+                    <View style={styles.recentCardThumbnail}>
+                      <DocumentThumbnail 
+                        type={doc.type as any} 
+                        thumbnailPath={doc.thumbnailPath}
+                        size="small"
+                      />
                     </View>
                     <Text style={[styles.recentCardName, { color: colors.textPrimary }]} numberOfLines={1}>
                       {doc.name}
@@ -460,35 +468,7 @@ const styles = StyleSheet.create({
     ...shadows.sm,
   },
   recentCardThumbnail: {
-    width: '100%',
-    height: 80,
-    borderRadius: borderRadius.sm,
-    justifyContent: 'center',
-    alignItems: 'center',
     marginBottom: spacing.sm,
-    overflow: 'hidden',
-  },
-  thumbnailDoc: {
-    width: '85%',
-    height: '90%',
-    backgroundColor: '#fff',
-    borderRadius: 4,
-    padding: 6,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 1,
-  },
-  thumbnailDocHeader: {
-    marginBottom: 6,
-  },
-  thumbnailDocLines: {
-    gap: 4,
-  },
-  thumbnailDocLine: {
-    height: 4,
-    borderRadius: 2,
   },
   recentCardName: {
     fontSize: typography.fontSize.sm,

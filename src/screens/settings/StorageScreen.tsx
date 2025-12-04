@@ -14,7 +14,7 @@ import { spacing, borderRadius, typography } from '../../constants/theme';
 import { useTheme } from '../../context/ThemeContext';
 
 const STORAGE_DATA = [
-  { label: 'Documents', size: 45.2, color: '#3A7CFF' },
+  { label: 'Documents', size: 45.2, color: '#017DE9' },
   { label: 'Scans', size: 23.8, color: '#34C759' },
   { label: 'Faxes', size: 12.1, color: '#FF9500' },
   { label: 'Cache', size: 8.5, color: '#FF3B30' },
@@ -211,7 +211,7 @@ const styles = StyleSheet.create({
     height: 60,
     borderRadius: 30,
     borderWidth: 3,
-    borderColor: '#3A7CFF',
+    borderColor: '#017DE9',
     justifyContent: 'center',
     alignItems: 'center',
   },

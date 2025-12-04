@@ -24,7 +24,7 @@ type RouteType = RouteProp<HomeStackParamList, 'AIChat'>;
 export default function AIChatScreen() {
   const navigation = useNavigation<NavigationProp>();
   const route = useRoute<RouteType>();
-  const { colors } = useTheme();
+  const { colors, isDark } = useTheme();
   const styles = createStyles(colors);
   const { conversationId, documentId } = route.params || {};
   const { conversations, updateConversation } = useAIStore();
@@ -220,6 +220,7 @@ export default function AIChatScreen() {
               onChangeText={setMessage}
               multiline
               maxLength={2000}
+              keyboardAppearance={isDark ? 'dark' : 'light'}
             />
           </View>
 
