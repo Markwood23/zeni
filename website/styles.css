@@ -966,35 +966,10 @@ body {
     -webkit-mask-image: radial-gradient(ellipse at center, black 0%, transparent 70%);
 }
 
-/* Tablet breakpoint for floating elements */
+/* Tablet breakpoint for floating elements - hide on tablets and smaller */
 @media (max-width: 1024px) {
     .floating-element {
-        transform: scale(0.75);
-    }
-    
-    .floating-element.element-1 {
-        top: 12%;
-        left: 3%;
-    }
-    
-    .floating-element.element-2 {
-        top: 15%;
-        right: 3%;
-    }
-    
-    .floating-element.element-3 {
-        top: 50%;
-        left: 2%;
-    }
-    
-    .floating-element.element-4 {
-        top: 40%;
-        right: 2%;
-    }
-    
-    .floating-element.element-5 {
-        bottom: 10%;
-        right: 8%;
+        display: none;
     }
 }
 
@@ -1054,10 +1029,6 @@ body {
     
     .phone-screen {
         width: 220px;
-    }
-    
-    .floating-element {
-        display: none;
     }
     
     .hero-stats {
