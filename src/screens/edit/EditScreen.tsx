@@ -5,6 +5,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   FlatList,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
@@ -14,7 +15,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { spacing, borderRadius, typography } from '../../constants/theme';
 import { useTheme } from '../../context/ThemeContext';
 import { HomeStackParamList, Document } from '../../types';
-import { useDocumentsStore } from '../../store';
+import { useDocumentsStore, useActivityStore, generateId, useUserStore } from '../../store';
 
 type NavigationProp = NativeStackNavigationProp<HomeStackParamList, 'Edit'>;
 
@@ -29,7 +30,9 @@ export default function EditScreen() {
   const navigation = useNavigation<NavigationProp>();
   const { colors } = useTheme();
   const styles = createStyles(colors);
-  const { documents } = useDocumentsStore();
+  const { documents, addDocument } = useDocumentsStore();
+  const { addActivity } = useActivityStore();
+  const { user } = useUserStore();
 
   const editableDocuments = documents.filter(
     (d) => d.mimeType === 'application/pdf' || d.mimeType.startsWith('image/')
@@ -47,11 +50,43 @@ export default function EditScreen() {
       });
 
       if (!result.canceled && result.assets[0]) {
-        // Would create document and navigate to edit
-        console.log('Selected file:', result.assets[0]);
+        const asset = result.assets[0];
+        const docId = generateId();
+        
+        // Create document from imported file
+        const newDocument: Document = {
+          id: docId,
+          userId: user?.id || 'guest',
+          name: asset.name,
+          type: 'imported',
+          filePath: asset.uri,
+          thumbnailPath: asset.mimeType?.startsWith('image/') ? asset.uri : undefined,
+          pagesCount: 1,
+          fileSize: asset.size || 0,
+          mimeType: asset.mimeType || 'application/octet-stream',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        };
+
+        addDocument(newDocument);
+
+        // Log activity
+        addActivity({
+          id: generateId(),
+          userId: user?.id || 'guest',
+          type: 'import',
+          documentId: docId,
+          title: 'File imported',
+          description: `Imported "${asset.name}" for editing`,
+          createdAt: new Date(),
+        });
+
+        // Navigate to edit the imported document
+        navigation.navigate('EditDocument', { documentId: docId });
       }
     } catch (error) {
       console.error('Error picking document:', error);
+      Alert.alert('Error', 'Failed to import file. Please try again.');
     }
   };
 
