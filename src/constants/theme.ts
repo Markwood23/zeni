@@ -55,11 +55,11 @@ export const lightColors = {
   shadow: 'rgba(0, 0, 0, 0.08)',
   shadowDark: 'rgba(0, 0, 0, 0.15)',
   
-  // Feature icon colors - Vibrant, balanced colors for both modes
-  scanIcon: '#3B82F6',      // Bright Blue - scan/camera
-  editIcon: '#10B981',      // Emerald Green - edit/sign
-  convertIcon: '#8B5CF6',   // Violet Purple - convert
-  askAiIcon: '#F59E0B',     // Amber Orange - AI/sparkles
+  // Feature icon colors
+  scanIcon: '#017DE9',
+  editIcon: '#22c55e',
+  convertIcon: '#8b5cf6',
+  askAiIcon: '#f59e0b',
   
   // Document type icon colors
   uploadedIcon: '#06b6d4',    // Cyan for uploaded
@@ -118,11 +118,11 @@ export const darkColors = {
   shadow: 'rgba(0, 0, 0, 0.4)',
   shadowDark: 'rgba(0, 0, 0, 0.6)',
   
-  // Feature icon colors - Brighter variants for dark mode
-  scanIcon: '#60A5FA',      // Lighter Blue
-  editIcon: '#34D399',      // Lighter Emerald
-  convertIcon: '#A78BFA',   // Lighter Violet
-  askAiIcon: '#FBBF24',     // Lighter Amber
+  // Feature icon colors
+  scanIcon: '#3b9eff',
+  editIcon: '#4ade80',
+  convertIcon: '#a78bfa',
+  askAiIcon: '#fbbf24',
   
   // Document type icon colors
   uploadedIcon: '#22d3ee',    // Cyan for uploaded
