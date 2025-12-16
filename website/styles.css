@@ -10,17 +10,17 @@
     --primary-light: #e8f4fd;
     --primary-glow: rgba(1, 125, 233, 0.2);
     
-    /* Accent Colors for Feature Cards - Modern & Vibrant */
-    --accent-green: #10B981;
-    --accent-green-bg: linear-gradient(135deg, #D1FAE5 0%, #A7F3D0 100%);
-    --accent-purple: #8B5CF6;
-    --accent-purple-bg: linear-gradient(135deg, #EDE9FE 0%, #DDD6FE 100%);
-    --accent-yellow: #F59E0B;
-    --accent-yellow-bg: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%);
-    --accent-pink: #EC4899;
-    --accent-pink-bg: #fce7f3;
-    --accent-orange: #F97316;
-    --accent-orange-bg: #ffedd5;
+    /* Feature Card Colors - Blue-based monochromatic palette */
+    --accent-green: #017DE9;
+    --accent-green-bg: #F0F7FF;
+    --accent-purple: #017DE9;
+    --accent-purple-bg: #F0F7FF;
+    --accent-yellow: #017DE9;
+    --accent-yellow-bg: #F0F7FF;
+    --accent-pink: #017DE9;
+    --accent-pink-bg: #F0F7FF;
+    --accent-orange: #017DE9;
+    --accent-orange-bg: #F0F7FF;
     
     /* Light theme (default) */
     --bg: #fafafa;
@@ -64,12 +64,12 @@
     --card-shadow: 0 1px 3px rgba(0,0,0,0.4), 0 4px 20px rgba(0,0,0,0.25);
     --card-shadow-hover: 0 8px 30px rgba(0,0,0,0.4);
     
-    /* Dark mode accent backgrounds - Deeper, richer tones */
-    --accent-green-bg: linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(16, 185, 129, 0.1) 100%);
-    --accent-purple-bg: linear-gradient(135deg, rgba(139, 92, 246, 0.2) 0%, rgba(139, 92, 246, 0.1) 100%);
-    --accent-yellow-bg: linear-gradient(135deg, rgba(245, 158, 11, 0.2) 0%, rgba(245, 158, 11, 0.1) 100%);
-    --accent-pink-bg: rgba(236, 72, 153, 0.15);
-    --accent-orange-bg: rgba(249, 115, 22, 0.15);
+    /* Dark mode accent backgrounds - Blue-based */
+    --accent-green-bg: rgba(1, 125, 233, 0.12);
+    --accent-purple-bg: rgba(1, 125, 233, 0.12);
+    --accent-yellow-bg: rgba(1, 125, 233, 0.12);
+    --accent-pink-bg: rgba(1, 125, 233, 0.12);
+    --accent-orange-bg: rgba(1, 125, 233, 0.12);
 }
 
 /* Reset & Base */
@@ -1163,10 +1163,10 @@ body {
     box-shadow: var(--card-shadow-hover);
 }
 
-/* Colorful Card Variants */
+/* Colorful Card Variants - Clean Blue Theme */
 .bento-card.card-green {
     background: var(--accent-green-bg);
-    border-color: rgba(16, 185, 129, 0.2);
+    border-color: rgba(1, 125, 233, 0.15);
 }
 
 .bento-card.card-green h3,
@@ -1175,13 +1175,13 @@ body {
 }
 
 .bento-card.card-green .card-icon {
-    background: var(--accent-green);
+    background: var(--primary);
     color: white;
 }
 
 .bento-card.card-purple {
     background: var(--accent-purple-bg);
-    border-color: rgba(139, 92, 246, 0.2);
+    border-color: rgba(1, 125, 233, 0.15);
 }
 
 .bento-card.card-purple h3,
@@ -1190,13 +1190,13 @@ body {
 }
 
 .bento-card.card-purple .card-icon {
-    background: var(--accent-purple);
+    background: var(--primary);
     color: white;
 }
 
 .bento-card.card-yellow {
     background: var(--accent-yellow-bg);
-    border-color: rgba(245, 158, 11, 0.2);
+    border-color: rgba(1, 125, 233, 0.15);
 }
 
 .bento-card.card-yellow h3,
@@ -1205,7 +1205,7 @@ body {
 }
 
 .bento-card.card-yellow .card-icon {
-    background: var(--accent-yellow);
+    background: var(--primary);
     color: white;
 }
 
