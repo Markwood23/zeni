@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Zeni Splash Screen - Clean Typography -->
+  <defs>
+    <!-- Subtle gradient background -->
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f8fafc"/>
+      <stop offset="100%" style="stop-color:#e2e8f0"/>
+    </linearGradient>
+    
+    <!-- Blue glow effect -->
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="512" height="512" fill="url(#bgGradient)"/>
+  
+  <!-- Decorative circles -->
+  <circle cx="80" cy="80" r="120" fill="#017DE9" opacity="0.03"/>
+  <circle cx="432" cy="432" r="150" fill="#017DE9" opacity="0.03"/>
+  
+  <!-- Main Logo Group - Centered -->
+  <g transform="translate(256, 230)">
+    <!-- Icon above text -->
+    <g transform="translate(-32, -80)">
+      <rect x="0" y="0" width="64" height="64" rx="14" fill="#017DE9"/>
+      <text x="14" y="47" font-family="Inter, -apple-system, BlinkMacSystemFont, sans-serif" font-size="48" font-weight="800" font-style="italic" fill="#ffffff">Z</text>
+    </g>
+    
+    <!-- Wordmark below -->
+    <text x="0" y="40" text-anchor="middle" font-family="Inter, -apple-system, BlinkMacSystemFont, sans-serif" font-size="56" font-weight="800" font-style="italic" fill="#017DE9" filter="url(#glow)">Z</text>
+    <text x="32" y="40" text-anchor="start" font-family="Inter, -apple-system, BlinkMacSystemFont, sans-serif" font-size="56" font-weight="600" fill="#1a1a1a">eni</text>
+  </g>
+  
+  <!-- Tagline -->
+  <text x="256" y="340" text-anchor="middle" font-family="Inter, -apple-system, BlinkMacSystemFont, sans-serif" font-size="16" font-weight="500" fill="#64748b" letter-spacing="2">SMART DOCUMENT WORKSPACE</text>
+  
+  <!-- Loading dots at bottom -->
+  <g transform="translate(256, 440)">
+    <circle cx="-20" cy="0" r="4" fill="#017DE9" opacity="0.9"/>
+    <circle cx="0" cy="0" r="4" fill="#017DE9" opacity="0.6"/>
+    <circle cx="20" cy="0" r="4" fill="#017DE9" opacity="0.3"/>
+  </g>
+</svg>

@@ -1,8 +1,25 @@
 // Type definitions for Zeni app
 
-export type DocumentType = 'scanned' | 'uploaded' | 'edited' | 'converted' | 'faxed';
+export type DocumentType = 'scanned' | 'uploaded' | 'edited' | 'converted' | 'faxed' | 'imported';
 
 export type DocumentFilter = 'all' | DocumentType;
+
+// Account types for hybrid model
+export type AccountType = 'standard' | 'student' | 'educator';
+export type VerificationStatus = 'unverified' | 'pending' | 'verified' | 'expired' | 'rejected';
+
+export interface StudentVerification {
+  status: VerificationStatus;
+  method?: 'edu_email' | 'student_id' | 'sheerid';
+  verifiedEmail?: string;
+  verifiedAt?: Date;
+  expiresAt?: Date; // Student status can expire (graduation)
+  institutionName?: string;
+  // Pending verification tracking
+  pendingSince?: Date; // When verification was initiated
+  remindersSent?: number; // How many reminders sent
+  lastReminderAt?: Date;
+}
 
 export interface User {
   id: string;
@@ -13,6 +30,12 @@ export interface User {
   school?: string;
   level?: string;
   avatarUrl?: string;
+  // Hybrid account system
+  accountType: AccountType;
+  verification?: StudentVerification;
+  // Premium features access
+  isPremium?: boolean;
+  premiumExpiresAt?: Date;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -28,6 +51,7 @@ export interface Document {
   fileSize: number; // in bytes
   mimeType: string;
   sourceDocumentId?: string; // for versioning
+  folderId?: string; // for folder organization
   tags?: string[];
   createdAt: Date;
   updatedAt: Date;
@@ -47,6 +71,36 @@ export interface Folder {
   iconType?: FolderIconType;
   createdAt: Date;
   updatedAt: Date;
+}
+
+// Folder Sharing types
+export type ShareAccessType = 'view' | 'download';
+export type ShareDuration = '1h' | '24h' | '7d' | '30d' | 'permanent';
+
+export interface FolderShareLink {
+  id: string;
+  folderId: string;
+  userId: string; // Owner who created the share
+  shareToken: string; // Unique token for the share URL
+  accessType: ShareAccessType;
+  password?: string; // Optional password protection
+  expiresAt?: Date; // When the link expires (undefined = permanent)
+  maxViews?: number; // Optional view limit
+  viewCount: number;
+  shareUrl: string; // Generated share URL/token
+  recipientEmail?: string; // If shared to specific user
+  isActive: boolean;
+  createdAt: Date;
+  lastAccessedAt?: Date;
+}
+
+// Share access log for tracking
+export interface ShareAccessLog {
+  id: string;
+  shareLinkId: string;
+  accessedAt: Date;
+  ipAddress?: string;
+  userAgent?: string;
 }
 
 export type FaxStatus = 'pending' | 'sending' | 'delivered' | 'failed';
@@ -98,7 +152,7 @@ export interface AIMessage {
 export interface Activity {
   id: string;
   userId: string;
-  type: 'scan' | 'edit' | 'convert' | 'fax' | 'share' | 'ai_chat' | 'upload';
+  type: 'scan' | 'edit' | 'convert' | 'fax' | 'share' | 'ai_chat' | 'upload' | 'delete' | 'move' | 'import';
   documentId?: string;
   title: string;
   description?: string;
@@ -143,6 +197,7 @@ export type AuthStackParamList = {
   Welcome: undefined;
   SignIn: undefined;
   SignUp: undefined;
+  ForgotPassword: undefined;
   VerifyPhone: { phone: string };
 };
 
@@ -171,6 +226,7 @@ export type HomeStackParamList = {
   NotificationCenter: undefined;
   NotificationDetail: { notificationId: string };
   HelpSupport: undefined;
+  SharedFolderView: { shareToken: string; password?: string };
 };
 
 export type DocumentsStackParamList = {
@@ -178,11 +234,13 @@ export type DocumentsStackParamList = {
   AllDocuments: { initialFilter?: DocumentFilter } | undefined;
   DocumentView: { documentId: string };
   FolderView: { folderId: string };
+  SharedFolderView: { shareToken: string; password?: string };
 };
 
 export type ProfileStackParamList = {
   ProfileScreen: undefined;
   AccountSettings: undefined;
+  StudentVerification: undefined;
   Notifications: undefined;
   Storage: undefined;
   Signatures: undefined;

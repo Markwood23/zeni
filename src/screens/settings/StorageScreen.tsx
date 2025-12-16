@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
   View,
   Text,
@@ -12,27 +12,46 @@ import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { spacing, borderRadius, typography } from '../../constants/theme';
 import { useTheme } from '../../context/ThemeContext';
-
-const STORAGE_DATA = [
-  { label: 'Documents', size: 45.2, color: '#017DE9' },
-  { label: 'Scans', size: 23.8, color: '#34C759' },
-  { label: 'Faxes', size: 12.1, color: '#FF9500' },
-  { label: 'Cache', size: 8.5, color: '#FF3B30' },
-  { label: 'Other', size: 5.4, color: '#8E8E93' },
-];
+import { useDocumentsStore, useFaxStore, useSignaturesStore } from '../../store';
 
 export default function StorageScreen() {
   const navigation = useNavigation();
   const { colors } = useTheme();
+  
+  const { documents } = useDocumentsStore();
+  const { faxJobs, clearAllFaxes } = useFaxStore();
+  const { signatures } = useSignaturesStore();
 
-  const totalUsed = STORAGE_DATA.reduce((sum, item) => sum + item.size, 0);
-  const totalStorage = 200; // MB
+  // Calculate actual storage usage from store data
+  const storageData = useMemo(() => {
+    // Calculate document sizes (estimate ~500KB per document)
+    const scannedDocs = documents.filter(d => d.type === 'scanned');
+    const uploadedDocs = documents.filter(d => d.type === 'uploaded');
+    
+    const documentsSize = uploadedDocs.length * 0.5; // MB
+    const scansSize = scannedDocs.length * 0.3; // MB
+    const faxesSize = faxJobs.length * 0.2; // MB
+    const signaturesSize = signatures.length * 0.01; // MB
+    const cacheSize = 2.5; // Estimated cache size
+    
+    return [
+      { label: 'Documents', size: Math.max(documentsSize, 0.1), color: colors.uploadedIcon, count: uploadedDocs.length },
+      { label: 'Scans', size: Math.max(scansSize, 0.1), color: colors.scanIcon, count: scannedDocs.length },
+      { label: 'Faxes', size: Math.max(faxesSize, 0.1), color: colors.faxedIcon, count: faxJobs.length },
+      { label: 'Signatures', size: Math.max(signaturesSize, 0.01), color: colors.accent, count: signatures.length },
+      { label: 'Cache', size: cacheSize, color: colors.error, count: null },
+    ];
+  }, [documents, faxJobs, signatures, colors]);
+
+  const totalUsed = storageData.reduce((sum, item) => sum + item.size, 0);
+  const totalStorage = 200; // MB (simulated limit)
   const usedPercentage = (totalUsed / totalStorage) * 100;
 
   const handleClearCache = () => {
+    const cacheItem = storageData.find(s => s.label === 'Cache');
     Alert.alert(
       'Clear Cache',
-      'This will free up 8.5 MB of storage. Your documents will not be affected.',
+      `This will free up ${cacheItem?.size.toFixed(1)} MB of storage. Your documents will not be affected.`,
       [
         { text: 'Cancel', style: 'cancel' },
         { text: 'Clear', style: 'destructive', onPress: () => Alert.alert('Success', 'Cache cleared successfully') },
@@ -41,12 +60,25 @@ export default function StorageScreen() {
   };
 
   const handleDeleteAllFaxes = () => {
+    if (faxJobs.length === 0) {
+      Alert.alert('No Faxes', 'You have no faxes to delete.');
+      return;
+    }
+    
+    const faxItem = storageData.find(s => s.label === 'Faxes');
     Alert.alert(
       'Delete All Faxes',
-      'This will permanently delete all your sent and received faxes. This action cannot be undone.',
+      `This will permanently delete all ${faxJobs.length} faxes and free up ${faxItem?.size.toFixed(1)} MB. This action cannot be undone.`,
       [
         { text: 'Cancel', style: 'cancel' },
-        { text: 'Delete', style: 'destructive', onPress: () => Alert.alert('Success', 'All faxes deleted') },
+        { 
+          text: 'Delete', 
+          style: 'destructive', 
+          onPress: () => {
+            clearAllFaxes();
+            Alert.alert('Success', 'All faxes deleted');
+          }
+        },
       ]
     );
   };
@@ -69,14 +101,14 @@ export default function StorageScreen() {
               <Text style={[styles.usedText, { color: colors.textPrimary }]}>{totalUsed.toFixed(1)} MB</Text>
               <Text style={[styles.totalText, { color: colors.textTertiary }]}>of {totalStorage} MB used</Text>
             </View>
-            <View style={styles.percentCircle}>
+            <View style={[styles.percentCircle, { borderColor: colors.primary }]}>
               <Text style={[styles.percentText, { color: colors.primary }]}>{usedPercentage.toFixed(0)}%</Text>
             </View>
           </View>
 
           {/* Progress Bar */}
           <View style={[styles.progressBar, { backgroundColor: colors.borderLight }]}>
-            {STORAGE_DATA.map((item, index) => {
+            {storageData.map((item, index) => {
               const widthPercent = (item.size / totalStorage) * 100;
               return (
                 <View
@@ -92,7 +124,7 @@ export default function StorageScreen() {
 
           {/* Legend */}
           <View style={styles.legend}>
-            {STORAGE_DATA.map((item, index) => (
+            {storageData.map((item, index) => (
               <View key={index} style={styles.legendItem}>
                 <View style={[styles.legendDot, { backgroundColor: item.color }]} />
                 <Text style={[styles.legendLabel, { color: colors.textSecondary }]}>{item.label}</Text>
@@ -104,18 +136,23 @@ export default function StorageScreen() {
         {/* Storage Breakdown */}
         <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>BREAKDOWN</Text>
         <View style={[styles.section, { backgroundColor: colors.surface }]}>
-          {STORAGE_DATA.map((item, index) => (
+          {storageData.map((item, index) => (
             <View 
               key={index} 
               style={[
                 styles.breakdownItem, 
                 { borderBottomColor: colors.borderLight },
-                index === STORAGE_DATA.length - 1 && { borderBottomWidth: 0 }
+                index === storageData.length - 1 && { borderBottomWidth: 0 }
               ]}
             >
               <View style={[styles.breakdownDot, { backgroundColor: item.color }]} />
-              <Text style={[styles.breakdownLabel, { color: colors.textPrimary }]}>{item.label}</Text>
-              <Text style={[styles.breakdownSize, { color: colors.textSecondary }]}>{item.size} MB</Text>
+              <View style={styles.breakdownInfo}>
+                <Text style={[styles.breakdownLabel, { color: colors.textPrimary }]}>{item.label}</Text>
+                {item.count !== null && (
+                  <Text style={[styles.breakdownCount, { color: colors.textTertiary }]}>{item.count} items</Text>
+                )}
+              </View>
+              <Text style={[styles.breakdownSize, { color: colors.textSecondary }]}>{item.size.toFixed(1)} MB</Text>
             </View>
           ))}
         </View>
@@ -141,8 +178,8 @@ export default function StorageScreen() {
             style={[styles.actionItem, { borderBottomColor: colors.borderLight }]}
             onPress={handleDeleteAllFaxes}
           >
-            <View style={[styles.actionIcon, { backgroundColor: '#FF9500' + '15' }]}>
-              <Ionicons name="document-text-outline" size={20} color="#FF9500" />
+            <View style={[styles.actionIcon, { backgroundColor: colors.faxedIcon + '15' }]}>
+              <Ionicons name="document-text-outline" size={20} color={colors.faxedIcon} />
             </View>
             <View style={styles.actionInfo}>
               <Text style={[styles.actionTitle, { color: colors.textPrimary }]}>Delete All Faxes</Text>
@@ -152,8 +189,8 @@ export default function StorageScreen() {
           </TouchableOpacity>
 
           <TouchableOpacity style={[styles.actionItem, { borderBottomWidth: 0 }]}>
-            <View style={[styles.actionIcon, { backgroundColor: colors.primary + '15' }]}>
-              <Ionicons name="cloud-upload-outline" size={20} color={colors.primary} />
+            <View style={[styles.actionIcon, { backgroundColor: colors.uploadedIcon + '15' }]}>
+              <Ionicons name="cloud-upload-outline" size={20} color={colors.uploadedIcon} />
             </View>
             <View style={styles.actionInfo}>
               <Text style={[styles.actionTitle, { color: colors.textPrimary }]}>Backup to Cloud</Text>
@@ -211,7 +248,7 @@ const styles = StyleSheet.create({
     height: 60,
     borderRadius: 30,
     borderWidth: 3,
-    borderColor: '#017DE9',
+    borderColor: '#017DE9', // Will be set inline with colors.primary
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -270,10 +307,16 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     marginRight: spacing.md,
   },
-  breakdownLabel: {
+  breakdownInfo: {
     flex: 1,
+  },
+  breakdownLabel: {
     fontSize: typography.fontSize.md,
     fontWeight: '500',
+  },
+  breakdownCount: {
+    fontSize: typography.fontSize.xs,
+    marginTop: 2,
   },
   breakdownSize: {
     fontSize: typography.fontSize.md,

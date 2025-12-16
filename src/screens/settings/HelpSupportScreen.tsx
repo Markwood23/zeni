@@ -261,8 +261,8 @@ export default function HelpSupportScreen() {
             style={[styles.quickAction, { backgroundColor: colors.surface }]}
             onPress={handleContactSupport}
           >
-            <View style={[styles.quickActionIcon, { backgroundColor: colors.primary + '15' }]}>
-              <Ionicons name="mail-outline" size={24} color={colors.primary} />
+            <View style={[styles.quickActionIcon, { backgroundColor: colors.info + '15' }]}>
+              <Ionicons name="mail-outline" size={24} color={colors.info} />
             </View>
             <Text style={[styles.quickActionText, { color: colors.textPrimary }]}>Email Us</Text>
           </TouchableOpacity>
@@ -394,8 +394,8 @@ export default function HelpSupportScreen() {
             style={[styles.contactItem, { borderBottomColor: colors.borderLight }]}
             onPress={handleContactSupport}
           >
-            <View style={[styles.contactIcon, { backgroundColor: colors.primary + '15' }]}>
-              <Ionicons name="mail-outline" size={22} color={colors.primary} />
+            <View style={[styles.contactIcon, { backgroundColor: colors.info + '15' }]}>
+              <Ionicons name="mail-outline" size={22} color={colors.info} />
             </View>
             <View style={styles.contactInfo}>
               <Text style={[styles.contactTitle, { color: colors.textPrimary }]}>Email Support</Text>
@@ -436,8 +436,8 @@ export default function HelpSupportScreen() {
             style={[styles.contactItem, { borderBottomWidth: 0 }]}
             onPress={() => Linking.openURL('https://zeniapp.com/feedback')}
           >
-            <View style={[styles.contactIcon, { backgroundColor: '#FF9500' + '15' }]}>
-              <Ionicons name="chatbubble-outline" size={22} color="#FF9500" />
+            <View style={[styles.contactIcon, { backgroundColor: colors.warning + '15' }]}>
+              <Ionicons name="chatbubble-outline" size={22} color={colors.warning} />
             </View>
             <View style={styles.contactInfo}>
               <Text style={[styles.contactTitle, { color: colors.textPrimary }]}>Send Feedback</Text>

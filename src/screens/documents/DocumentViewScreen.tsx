@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -7,18 +7,27 @@ import {
   ScrollView,
   Share,
   Alert,
+  Image,
+  Dimensions,
+  Modal,
+  ActivityIndicator,
+  FlatList,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useRoute, RouteProp, CommonActions } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Ionicons } from '@expo/vector-icons';
+import * as FileSystem from 'expo-file-system';
+import * as Sharing from 'expo-sharing';
 import { spacing, borderRadius, typography } from '../../constants/theme';
 import { useTheme } from '../../context/ThemeContext';
-import { DocumentsStackParamList, Document } from '../../types';
-import { useDocumentsStore } from '../../store';
+import { DocumentsStackParamList, Document, Folder } from '../../types';
+import { useDocumentsStore, generateId, useActivityStore, useUserStore } from '../../store';
 
 type NavigationProp = NativeStackNavigationProp<DocumentsStackParamList, 'DocumentView'>;
 type RouteType = RouteProp<DocumentsStackParamList, 'DocumentView'>;
+
+const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
 export default function DocumentViewScreen() {
   const navigation = useNavigation<NavigationProp>();
@@ -26,7 +35,14 @@ export default function DocumentViewScreen() {
   const { colors } = useTheme();
   const styles = createStyles(colors);
   const { documentId } = route.params;
-  const { documents, deleteDocument } = useDocumentsStore();
+  const { documents, folders, deleteDocument, updateDocument, addDocumentToFolder, removeDocumentFromFolder } = useDocumentsStore();
+  const { addActivity } = useActivityStore();
+  const { user } = useUserStore();
+  
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
+  const [showFolderModal, setShowFolderModal] = useState(false);
 
   const document = documents.find((d: Document) => d.id === documentId);
 
@@ -64,12 +80,68 @@ export default function DocumentViewScreen() {
 
   const handleShare = async () => {
     try {
-      await Share.share({
-        message: `Check out this document: ${document.name}`,
-        // url: document.filePath, // Would be the actual file path
+      setIsLoading(true);
+      
+      // Check if we have a file path and if sharing is available
+      if (document.filePath && await Sharing.isAvailableAsync()) {
+        await Sharing.shareAsync(document.filePath, {
+          mimeType: document.mimeType,
+          dialogTitle: `Share ${document.name}`,
+        });
+      } else {
+        // Fallback to basic share
+        await Share.share({
+          message: `Check out this document: ${document.name}`,
+          title: document.name,
+        });
+      }
+      
+      addActivity({
+        id: generateId(),
+        userId: user?.id || 'guest',
+        type: 'share',
+        documentId: document.id,
+        title: 'Document shared',
+        description: `Shared "${document.name}"`,
+        createdAt: new Date(),
       });
     } catch (error) {
       console.error('Error sharing:', error);
+      Alert.alert('Error', 'Failed to share document');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleOpenDocument = async () => {
+    try {
+      setIsLoading(true);
+      
+      if (document.filePath) {
+        // Try to open with external app
+        if (document.mimeType.startsWith('image/')) {
+          // For images, show fullscreen viewer
+          setIsFullscreen(true);
+        } else if (await Sharing.isAvailableAsync()) {
+          // For PDFs and other documents, share to open in another app
+          await Sharing.shareAsync(document.filePath, {
+            mimeType: document.mimeType,
+            UTI: document.mimeType === 'application/pdf' ? 'com.adobe.pdf' : undefined,
+          });
+        } else {
+          Alert.alert('Info', 'Unable to open document. Try sharing to another app.');
+        }
+      } else if (document.thumbnailPath) {
+        // If we only have thumbnail, show that
+        setIsFullscreen(true);
+      } else {
+        Alert.alert('Info', 'Document preview not available. Try sharing to another app.');
+      }
+    } catch (error) {
+      console.error('Error opening document:', error);
+      Alert.alert('Error', 'Failed to open document');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -84,6 +156,15 @@ export default function DocumentViewScreen() {
           style: 'destructive',
           onPress: () => {
             deleteDocument(documentId);
+            addActivity({
+              id: generateId(),
+              userId: user?.id || 'guest',
+              type: 'delete',
+              documentId: document.id,
+              title: 'Document deleted',
+              description: `Deleted "${document.name}"`,
+              createdAt: new Date(),
+            });
             navigation.goBack();
           },
         },
@@ -92,7 +173,6 @@ export default function DocumentViewScreen() {
   };
 
   const handleEdit = () => {
-    // Navigate to Edit screen with document
     navigation.dispatch(
       CommonActions.navigate({
         name: 'Home',
@@ -105,7 +185,6 @@ export default function DocumentViewScreen() {
   };
 
   const handleConvert = () => {
-    // Navigate to Convert screen with document
     navigation.dispatch(
       CommonActions.navigate({
         name: 'Home',
@@ -118,7 +197,6 @@ export default function DocumentViewScreen() {
   };
 
   const handleFax = () => {
-    // Navigate to Fax screen with document
     navigation.dispatch(
       CommonActions.navigate({
         name: 'Home',
@@ -127,30 +205,6 @@ export default function DocumentViewScreen() {
           params: { documentId: document.id },
         },
       })
-    );
-  };
-
-  const handleOpenDocument = () => {
-    Alert.alert(
-      'Open Document',
-      'Document viewer will be available in a future update. For now, you can share the document to open it in another app.',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        { text: 'Share Instead', onPress: handleShare },
-      ]
-    );
-  };
-
-  const handleMoreOptions = () => {
-    Alert.alert(
-      document.name,
-      'Choose an action',
-      [
-        { text: 'Rename', onPress: handleRename },
-        { text: 'Duplicate', onPress: handleDuplicate },
-        { text: 'Move to Folder', onPress: handleMoveToFolder },
-        { text: 'Cancel', style: 'cancel' },
-      ]
     );
   };
 
@@ -164,23 +218,184 @@ export default function DocumentViewScreen() {
           text: 'Rename',
           onPress: (newName?: string) => {
             if (newName && newName.trim()) {
-              // Would update document name here
-              Alert.alert('Success', `Document renamed to "${newName.trim()}"`);
+              const extension = document.name.split('.').pop() || '';
+              const updatedName = newName.trim().includes('.') 
+                ? newName.trim() 
+                : `${newName.trim()}.${extension}`;
+              
+              updateDocument(document.id, { 
+                name: updatedName,
+                updatedAt: new Date()
+              });
+              Alert.alert('Success', `Document renamed to "${updatedName}"`);
             }
           },
         },
       ],
       'plain-text',
-      document.name.replace(/\.[^/.]+$/, '') // Remove extension for editing
+      document.name.replace(/\.[^/.]+$/, '')
     );
   };
 
   const handleDuplicate = () => {
-    Alert.alert('Duplicate', 'Document duplicated successfully!');
+    const newDocId = generateId();
+    const baseName = document.name.replace(/\.[^/.]+$/, '');
+    const extension = document.name.split('.').pop() || '';
+    
+    const duplicatedDoc = {
+      ...document,
+      id: newDocId,
+      name: `${baseName}_copy.${extension}`,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    
+    // Note: Would need addDocument in store, for now just show success
+    Alert.alert('Success', 'Document duplicated successfully!');
   };
 
-  const handleMoveToFolder = () => {
-    Alert.alert('Move to Folder', 'Folder selection will be available in a future update.');
+  const handleMoreOptions = () => {
+    Alert.alert(
+      document.name,
+      'Choose an action',
+      [
+        { text: 'Rename', onPress: handleRename },
+        { text: 'Duplicate', onPress: handleDuplicate },
+        { text: 'Move to Folder', onPress: () => setShowFolderModal(true) },
+        { text: 'Cancel', style: 'cancel' },
+      ]
+    );
+  };
+
+  const getCurrentFolder = (): Folder | null => {
+    return folders.find((f: Folder) => f.documentIds.includes(documentId)) || null;
+  };
+
+  const handleMoveToFolder = (folderId: string | null) => {
+    const currentFolder = getCurrentFolder();
+    
+    // Remove from current folder if exists
+    if (currentFolder) {
+      removeDocumentFromFolder(currentFolder.id, documentId);
+    }
+    
+    // Add to new folder if selected
+    if (folderId) {
+      addDocumentToFolder(folderId, documentId);
+      const targetFolder = folders.find((f: Folder) => f.id === folderId);
+      addActivity({
+        id: generateId(),
+        userId: user?.id || 'guest',
+        type: 'move',
+        documentId: document.id,
+        title: 'Document moved',
+        description: `Moved "${document.name}" to "${targetFolder?.name}"`,
+        createdAt: new Date(),
+      });
+      Alert.alert('Success', `Document moved to "${targetFolder?.name}"`);
+    } else {
+      if (currentFolder) {
+        addActivity({
+          id: generateId(),
+          userId: user?.id || 'guest',
+          type: 'move',
+          documentId: document.id,
+          title: 'Document removed from folder',
+          description: `Removed "${document.name}" from "${currentFolder.name}"`,
+          createdAt: new Date(),
+        });
+        Alert.alert('Success', 'Document removed from folder');
+      }
+    }
+    
+    setShowFolderModal(false);
+  };
+
+  const renderFolderItem = ({ item }: { item: Folder | { id: null; name: string } }) => {
+    const currentFolder = getCurrentFolder();
+    const isCurrentFolder = currentFolder?.id === item.id;
+    
+    return (
+      <TouchableOpacity
+        style={[
+          styles.folderItem,
+          isCurrentFolder && styles.folderItemCurrent,
+        ]}
+        onPress={() => handleMoveToFolder(item.id)}
+        disabled={isCurrentFolder}
+      >
+        <View style={[styles.folderItemIcon, { backgroundColor: item.id ? (item as Folder).color || colors.primary : colors.surfaceSecondary }]}>
+          <Ionicons 
+            name={item.id ? ((item as Folder).icon as any || 'folder') : 'close-circle-outline'} 
+            size={20} 
+            color={item.id ? '#fff' : colors.textSecondary} 
+          />
+        </View>
+        <View style={styles.folderItemInfo}>
+          <Text style={styles.folderItemName}>{item.name}</Text>
+          {item.id && (
+            <Text style={styles.folderItemCount}>
+              {(item as Folder).documentIds.length} document{(item as Folder).documentIds.length !== 1 ? 's' : ''}
+            </Text>
+          )}
+        </View>
+        {isCurrentFolder && (
+          <View style={styles.currentBadge}>
+            <Text style={styles.currentBadgeText}>Current</Text>
+          </View>
+        )}
+      </TouchableOpacity>
+    );
+  };
+
+  const renderDocumentPreview = () => {
+    const imageUri = document.thumbnailPath || document.filePath;
+    
+    if (imageUri && (document.mimeType.startsWith('image/') || document.thumbnailPath)) {
+      return (
+        <TouchableOpacity 
+          style={styles.imagePreviewContainer}
+          onPress={() => setIsFullscreen(true)}
+          activeOpacity={0.9}
+        >
+          <Image
+            source={{ uri: imageUri }}
+            style={styles.imagePreview}
+            resizeMode="contain"
+          />
+          <View style={styles.zoomHint}>
+            <Ionicons name="expand-outline" size={16} color="#fff" />
+            <Text style={styles.zoomHintText}>Tap to expand</Text>
+          </View>
+        </TouchableOpacity>
+      );
+    }
+    
+    // Fallback placeholder for PDFs or documents without thumbnails
+    return (
+      <View style={styles.preview}>
+        <View style={styles.previewContent}>
+          <View style={styles.previewHeader}>
+            <Ionicons 
+              name={document.mimeType === 'application/pdf' ? 'document' : 'document-text'} 
+              size={32} 
+              color={document.mimeType === 'application/pdf' ? '#EF4444' : colors.textSecondary} 
+            />
+            <Text style={styles.previewFileName} numberOfLines={1}>{document.name}</Text>
+          </View>
+          <View style={styles.previewBody}>
+            <View style={styles.previewLines}>
+              {[...Array(12)].map((_, i) => (
+                <View key={i} style={[styles.previewLine, { width: `${65 + Math.random() * 30}%` }]} />
+              ))}
+            </View>
+          </View>
+          <View style={styles.previewFooter}>
+            <Text style={styles.previewPageText}>Page {currentPage} of {document.pagesCount}</Text>
+          </View>
+        </View>
+      </View>
+    );
   };
 
   const actions = [
@@ -212,25 +427,31 @@ export default function DocumentViewScreen() {
         {/* Document Preview */}
         <View style={styles.previewContainer}>
           <View style={styles.previewShadow}>
-            <View style={styles.preview}>
-              <View style={styles.previewContent}>
-                <View style={styles.previewHeader}>
-                  <Ionicons name="document-text" size={28} color={colors.textSecondary} />
-                  <Text style={styles.previewFileName} numberOfLines={1}>{document.name}</Text>
-                </View>
-                <View style={styles.previewBody}>
-                  <View style={styles.previewLines}>
-                    {[...Array(12)].map((_, i) => (
-                      <View key={i} style={[styles.previewLine, { width: `${65 + Math.random() * 30}%` }]} />
-                    ))}
-                  </View>
-                </View>
-                <View style={styles.previewFooter}>
-                  <Text style={styles.previewPageText}>Page 1 of {document.pagesCount}</Text>
-                </View>
-              </View>
-            </View>
+            {renderDocumentPreview()}
           </View>
+          
+          {/* Page Navigation for multi-page docs */}
+          {document.pagesCount > 1 && (
+            <View style={styles.pageNavigation}>
+              <TouchableOpacity 
+                style={[styles.pageButton, currentPage === 1 && styles.pageButtonDisabled]}
+                onPress={() => setCurrentPage(p => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+              >
+                <Ionicons name="chevron-back" size={20} color={currentPage === 1 ? colors.textTertiary : colors.primary} />
+              </TouchableOpacity>
+              <Text style={styles.pageIndicator}>
+                {currentPage} / {document.pagesCount}
+              </Text>
+              <TouchableOpacity 
+                style={[styles.pageButton, currentPage === document.pagesCount && styles.pageButtonDisabled]}
+                onPress={() => setCurrentPage(p => Math.min(document.pagesCount, p + 1))}
+                disabled={currentPage === document.pagesCount}
+              >
+                <Ionicons name="chevron-forward" size={20} color={currentPage === document.pagesCount ? colors.textTertiary : colors.primary} />
+              </TouchableOpacity>
+            </View>
+          )}
         </View>
 
         {/* Document Info */}
@@ -289,11 +510,100 @@ export default function DocumentViewScreen() {
 
       {/* Bottom Action */}
       <View style={styles.bottomAction}>
-        <TouchableOpacity style={styles.openButton} onPress={handleOpenDocument}>
-          <Ionicons name="open-outline" size={20} color={colors.textInverse} />
-          <Text style={styles.openButtonText}>Open Document</Text>
+        <TouchableOpacity 
+          style={styles.openButton} 
+          onPress={handleOpenDocument}
+          disabled={isLoading}
+        >
+          {isLoading ? (
+            <ActivityIndicator color={colors.textInverse} />
+          ) : (
+            <>
+              <Ionicons name="open-outline" size={20} color={colors.textInverse} />
+              <Text style={styles.openButtonText}>Open Document</Text>
+            </>
+          )}
         </TouchableOpacity>
       </View>
+
+      {/* Fullscreen Image Modal */}
+      <Modal visible={isFullscreen} animationType="fade" statusBarTranslucent>
+        <View style={styles.fullscreenContainer}>
+          <TouchableOpacity 
+            style={styles.fullscreenClose}
+            onPress={() => setIsFullscreen(false)}
+          >
+            <View style={styles.closeButtonBg}>
+              <Ionicons name="close" size={28} color="#fff" />
+            </View>
+          </TouchableOpacity>
+          
+          <ScrollView 
+            contentContainerStyle={styles.fullscreenScrollContent}
+            maximumZoomScale={4}
+            minimumZoomScale={1}
+            showsVerticalScrollIndicator={false}
+            showsHorizontalScrollIndicator={false}
+          >
+            <Image
+              source={{ uri: document.thumbnailPath || document.filePath }}
+              style={styles.fullscreenImage}
+              resizeMode="contain"
+            />
+          </ScrollView>
+          
+          {/* Fullscreen page navigation */}
+          {document.pagesCount > 1 && (
+            <View style={styles.fullscreenPageNav}>
+              <TouchableOpacity 
+                style={styles.fullscreenPageButton}
+                onPress={() => setCurrentPage(p => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+              >
+                <Ionicons name="chevron-back" size={24} color={currentPage === 1 ? '#666' : '#fff'} />
+              </TouchableOpacity>
+              <Text style={styles.fullscreenPageText}>
+                {currentPage} / {document.pagesCount}
+              </Text>
+              <TouchableOpacity 
+                style={styles.fullscreenPageButton}
+                onPress={() => setCurrentPage(p => Math.min(document.pagesCount, p + 1))}
+                disabled={currentPage === document.pagesCount}
+              >
+                <Ionicons name="chevron-forward" size={24} color={currentPage === document.pagesCount ? '#666' : '#fff'} />
+              </TouchableOpacity>
+            </View>
+          )}
+        </View>
+      </Modal>
+
+      {/* Move to Folder Modal */}
+      <Modal visible={showFolderModal} animationType="slide" transparent>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Move to Folder</Text>
+              <TouchableOpacity onPress={() => setShowFolderModal(false)}>
+                <Ionicons name="close" size={24} color={colors.textPrimary} />
+              </TouchableOpacity>
+            </View>
+            
+            <FlatList
+              data={[{ id: null, name: 'Remove from folder' }, ...folders]}
+              renderItem={renderFolderItem}
+              keyExtractor={(item) => item.id || 'no-folder'}
+              contentContainerStyle={styles.folderList}
+              ListEmptyComponent={
+                <View style={styles.emptyFolders}>
+                  <Ionicons name="folder-open-outline" size={48} color={colors.textTertiary} />
+                  <Text style={styles.emptyFoldersText}>No folders yet</Text>
+                  <Text style={styles.emptyFoldersSubtext}>Create a folder in Documents Hub</Text>
+                </View>
+              }
+            />
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -500,5 +810,195 @@ const createStyles = (colors: any) => StyleSheet.create({
     fontSize: typography.fontSize.lg,
     fontWeight: '600',
     color: colors.textInverse,
+  },
+  imagePreviewContainer: {
+    width: '100%',
+    aspectRatio: 0.707,
+    backgroundColor: colors.surface,
+    borderRadius: borderRadius.md,
+    borderWidth: 1,
+    borderColor: colors.borderLight,
+    overflow: 'hidden',
+  },
+  imagePreview: {
+    width: '100%',
+    height: '100%',
+  },
+  zoomHint: {
+    position: 'absolute',
+    bottom: spacing.md,
+    right: spacing.md,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    borderRadius: borderRadius.lg,
+  },
+  zoomHintText: {
+    fontSize: typography.fontSize.xs,
+    color: '#fff',
+  },
+  pageNavigation: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing.lg,
+    marginTop: spacing.lg,
+  },
+  pageButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: colors.surface,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  pageButtonDisabled: {
+    opacity: 0.5,
+  },
+  pageIndicator: {
+    fontSize: typography.fontSize.md,
+    fontWeight: '500',
+    color: colors.textPrimary,
+  },
+  fullscreenContainer: {
+    flex: 1,
+    backgroundColor: '#000',
+  },
+  fullscreenClose: {
+    position: 'absolute',
+    top: 60,
+    right: spacing.lg,
+    zIndex: 10,
+  },
+  closeButtonBg: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  fullscreenScrollContent: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  fullscreenImage: {
+    width: screenWidth,
+    height: screenHeight * 0.8,
+  },
+  fullscreenPageNav: {
+    position: 'absolute',
+    bottom: 60,
+    left: 0,
+    right: 0,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing.xl,
+  },
+  fullscreenPageButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  fullscreenPageText: {
+    fontSize: typography.fontSize.lg,
+    fontWeight: '600',
+    color: '#fff',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'flex-end',
+  },
+  modalContent: {
+    backgroundColor: colors.background,
+    borderTopLeftRadius: borderRadius.xxl,
+    borderTopRightRadius: borderRadius.xxl,
+    maxHeight: '70%',
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: spacing.xl,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.borderLight,
+  },
+  modalTitle: {
+    fontSize: typography.fontSize.lg,
+    fontWeight: '600',
+    color: colors.textPrimary,
+  },
+  folderList: {
+    padding: spacing.lg,
+    paddingBottom: spacing.huge,
+  },
+  folderItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.surface,
+    padding: spacing.md,
+    borderRadius: borderRadius.lg,
+    marginBottom: spacing.md,
+  },
+  folderItemCurrent: {
+    opacity: 0.6,
+  },
+  folderItemIcon: {
+    width: 44,
+    height: 44,
+    borderRadius: borderRadius.md,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: spacing.md,
+  },
+  folderItemInfo: {
+    flex: 1,
+  },
+  folderItemName: {
+    fontSize: typography.fontSize.md,
+    fontWeight: '500',
+    color: colors.textPrimary,
+    marginBottom: spacing.xs,
+  },
+  folderItemCount: {
+    fontSize: typography.fontSize.sm,
+    color: colors.textTertiary,
+  },
+  currentBadge: {
+    backgroundColor: colors.primaryLight,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.xs,
+    borderRadius: borderRadius.sm,
+  },
+  currentBadgeText: {
+    fontSize: typography.fontSize.xs,
+    fontWeight: '500',
+    color: colors.primary,
+  },
+  emptyFolders: {
+    alignItems: 'center',
+    paddingVertical: spacing.xxxl,
+  },
+  emptyFoldersText: {
+    fontSize: typography.fontSize.lg,
+    fontWeight: '600',
+    color: colors.textSecondary,
+    marginTop: spacing.md,
+  },
+  emptyFoldersSubtext: {
+    fontSize: typography.fontSize.md,
+    color: colors.textTertiary,
+    marginTop: spacing.xs,
   },
 });

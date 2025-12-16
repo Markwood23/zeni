@@ -19,10 +19,10 @@ import { useDocumentsStore } from '../../store';
 type NavigationProp = NativeStackNavigationProp<HomeStackParamList, 'Edit'>;
 
 const editTools = [
-  { id: 'text', icon: 'text' as keyof typeof Ionicons.glyphMap, title: 'Add Text', description: 'Insert text fields' },
-  { id: 'sign', icon: 'pencil' as keyof typeof Ionicons.glyphMap, title: 'eSign', description: 'Add your signature' },
-  { id: 'markup', icon: 'brush' as keyof typeof Ionicons.glyphMap, title: 'Mark Up', description: 'Draw & highlight' },
-  { id: 'shapes', icon: 'shapes' as keyof typeof Ionicons.glyphMap, title: 'Shapes', description: 'Checkmarks, lines' },
+  { id: 'text', icon: 'text' as keyof typeof Ionicons.glyphMap, title: 'Add Text', description: 'Insert text fields', colorKey: 'askAiIcon' },
+  { id: 'sign', icon: 'pencil' as keyof typeof Ionicons.glyphMap, title: 'eSign', description: 'Add your signature', colorKey: 'editIcon' },
+  { id: 'markup', icon: 'brush' as keyof typeof Ionicons.glyphMap, title: 'Mark Up', description: 'Draw & highlight', colorKey: 'convertIcon' },
+  { id: 'shapes', icon: 'shapes' as keyof typeof Ionicons.glyphMap, title: 'Shapes', description: 'Checkmarks, lines', colorKey: 'faxedIcon' },
 ];
 
 export default function EditScreen() {
@@ -60,8 +60,8 @@ export default function EditScreen() {
       style={styles.documentCard}
       onPress={() => handleSelectDocument(item.id)}
     >
-      <View style={styles.documentThumbnail}>
-        <Ionicons name="document-text" size={28} color={colors.primary} />
+      <View style={[styles.documentThumbnail, { backgroundColor: colors.editIcon + '15' }]}>
+        <Ionicons name="document-text" size={28} color={colors.editIcon} />
       </View>
       <View style={styles.documentInfo}>
         <Text style={styles.documentName} numberOfLines={1}>
@@ -100,11 +100,11 @@ export default function EditScreen() {
               <View style={styles.toolsGrid}>
                 {editTools.map((tool) => (
                   <View key={tool.id} style={styles.toolCard}>
-                    <View style={styles.toolIcon}>
+                    <View style={[styles.toolIcon, { backgroundColor: (colors as any)[tool.colorKey] + '15' }]}>
                       <Ionicons
                         name={tool.icon}
                         size={24}
-                        color={colors.primary}
+                        color={(colors as any)[tool.colorKey]}
                       />
                     </View>
                     <Text style={styles.toolTitle}>{tool.title}</Text>
@@ -117,8 +117,8 @@ export default function EditScreen() {
             {/* Import Button */}
             <View style={styles.importSection}>
               <TouchableOpacity style={styles.importButton} onPress={handleImport}>
-                <Ionicons name="cloud-upload-outline" size={24} color={colors.primary} />
-                <Text style={styles.importText}>Import from Files</Text>
+                <Ionicons name="cloud-upload-outline" size={24} color={colors.uploadedIcon} />
+                <Text style={[styles.importText, { color: colors.uploadedIcon }]}>Import from Files</Text>
               </TouchableOpacity>
             </View>
 

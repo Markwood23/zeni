@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Zeni Icon - Circular version -->
+  
+  <!-- Background Circle -->
+  <circle cx="32" cy="32" r="32" fill="#017DE9"/>
+  
+  <!-- Z Letter - White, italic style with tail -->
+  <path d="M16 18H48L46 23H27L46 43V48H16L18 43H37L18 23V18Z" fill="white" transform="skewX(-5) translate(2, 0)"/>
+</svg>

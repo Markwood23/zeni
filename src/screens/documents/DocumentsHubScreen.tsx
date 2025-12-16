@@ -68,13 +68,14 @@ export default function DocumentsHubScreen() {
     return docs;
   }, [documents, selectedFilter, searchQuery]);
 
-  // Get folder with document count
+  // Get folder with document count (only count documents that actually exist)
   const foldersWithCount = useMemo(() => {
+    const documentIds = new Set(documents.map((d: Document) => d.id));
     return folders.map((folder: Folder) => ({
       ...folder,
-      count: folder.documentIds.length,
+      count: folder.documentIds.filter((id: string) => documentIds.has(id)).length,
     }));
-  }, [folders]);
+  }, [folders, documents]);
 
   const handleCreateFolder = () => {
     Alert.prompt(
@@ -130,8 +131,31 @@ export default function DocumentsHubScreen() {
         return 'create';
       case 'faxed':
         return 'print';
+      case 'imported':
+        return 'download';
+      case 'converted':
+        return 'swap-horizontal';
       default:
         return 'document-text';
+    }
+  };
+
+  const getDocumentIconColor = (type: string): string => {
+    switch (type) {
+      case 'scanned':
+        return colors.scanIcon;
+      case 'uploaded':
+        return colors.uploadedIcon;
+      case 'edited':
+        return colors.editIcon;
+      case 'faxed':
+        return colors.faxedIcon;
+      case 'imported':
+        return colors.importedIcon;
+      case 'converted':
+        return colors.convertIcon;
+      default:
+        return colors.primary;
     }
   };
 
@@ -226,6 +250,7 @@ export default function DocumentsHubScreen() {
         type={item.type as any}
         thumbnailPath={item.thumbnailPath}
         size="medium"
+        iconColor={getDocumentIconColor(item.type)}
       />
       <View style={styles.documentInfo}>
         <Text style={styles.documentName} numberOfLines={1}>
@@ -252,6 +277,7 @@ export default function DocumentsHubScreen() {
           type={item.type as any}
           thumbnailPath={item.thumbnailPath}
           size="large"
+          iconColor={getDocumentIconColor(item.type)}
         />
       </View>
       <View style={styles.gridInfo}>

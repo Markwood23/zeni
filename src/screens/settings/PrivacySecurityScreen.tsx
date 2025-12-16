@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -8,21 +8,74 @@ import {
   Switch,
   Alert,
   Linking,
+  Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
+import * as LocalAuthentication from 'expo-local-authentication';
 import { spacing, borderRadius, typography } from '../../constants/theme';
 import { useTheme } from '../../context/ThemeContext';
+import { useSettingsStore } from '../../store';
 
 export default function PrivacySecurityScreen() {
   const navigation = useNavigation();
   const { colors } = useTheme();
   
-  const [biometricEnabled, setBiometricEnabled] = useState(false);
-  const [autoLock, setAutoLock] = useState(true);
-  const [saveHistory, setSaveHistory] = useState(true);
-  const [analytics, setAnalytics] = useState(true);
+  const {
+    biometricEnabled,
+    autoLockEnabled,
+    saveActivityHistory,
+    analyticsEnabled,
+    setSecuritySetting,
+  } = useSettingsStore();
+  
+  const [biometricAvailable, setBiometricAvailable] = useState(false);
+  const [biometricType, setBiometricType] = useState<string>('Biometric');
+
+  useEffect(() => {
+    checkBiometricAvailability();
+  }, []);
+
+  const checkBiometricAvailability = async () => {
+    const compatible = await LocalAuthentication.hasHardwareAsync();
+    const enrolled = await LocalAuthentication.isEnrolledAsync();
+    setBiometricAvailable(compatible && enrolled);
+    
+    if (compatible) {
+      const types = await LocalAuthentication.supportedAuthenticationTypesAsync();
+      if (types.includes(LocalAuthentication.AuthenticationType.FACIAL_RECOGNITION)) {
+        setBiometricType(Platform.OS === 'ios' ? 'Face ID' : 'Face Recognition');
+      } else if (types.includes(LocalAuthentication.AuthenticationType.FINGERPRINT)) {
+        setBiometricType(Platform.OS === 'ios' ? 'Touch ID' : 'Fingerprint');
+      }
+    }
+  };
+
+  const handleBiometricToggle = async (value: boolean) => {
+    if (value && biometricAvailable) {
+      // Authenticate before enabling
+      const result = await LocalAuthentication.authenticateAsync({
+        promptMessage: `Enable ${biometricType}`,
+        cancelLabel: 'Cancel',
+        fallbackLabel: 'Use Passcode',
+      });
+      
+      if (result.success) {
+        setSecuritySetting('biometricEnabled', true);
+        Alert.alert('Success', `${biometricType} enabled successfully`);
+      } else {
+        Alert.alert('Authentication Failed', 'Could not verify your identity');
+      }
+    } else if (value && !biometricAvailable) {
+      Alert.alert(
+        'Biometric Not Available',
+        'Please set up Face ID or Touch ID in your device settings first.'
+      );
+    } else {
+      setSecuritySetting('biometricEnabled', false);
+    }
+  };
 
   const handleClearData = () => {
     Alert.alert(
@@ -62,33 +115,36 @@ export default function PrivacySecurityScreen() {
         <View style={[styles.section, { backgroundColor: colors.surface }]}>
           <View style={[styles.settingItem, { borderBottomColor: colors.borderLight }]}>
             <View style={styles.settingIcon}>
-              <Ionicons name="finger-print" size={22} color={colors.primary} />
+              <Ionicons name="finger-print" size={22} color={biometricAvailable ? colors.primary : colors.textTertiary} />
             </View>
             <View style={styles.settingInfo}>
-              <Text style={[styles.settingTitle, { color: colors.textPrimary }]}>Biometric Login</Text>
-              <Text style={[styles.settingDesc, { color: colors.textTertiary }]}>Use Face ID or Touch ID</Text>
+              <Text style={[styles.settingTitle, { color: colors.textPrimary }]}>{biometricType} Login</Text>
+              <Text style={[styles.settingDesc, { color: colors.textTertiary }]}>
+                {biometricAvailable ? `Use ${biometricType} to unlock` : 'Not available on this device'}
+              </Text>
             </View>
             <Switch
               value={biometricEnabled}
-              onValueChange={setBiometricEnabled}
+              onValueChange={handleBiometricToggle}
               trackColor={{ false: colors.border, true: colors.primary + '50' }}
               thumbColor={biometricEnabled ? colors.primary : colors.textTertiary}
+              disabled={!biometricAvailable}
             />
           </View>
 
           <View style={[styles.settingItem, { borderBottomWidth: 0 }]}>
             <View style={styles.settingIcon}>
-              <Ionicons name="lock-closed-outline" size={22} color={colors.primary} />
+              <Ionicons name="lock-closed-outline" size={22} color={colors.settingsIcon} />
             </View>
             <View style={styles.settingInfo}>
               <Text style={[styles.settingTitle, { color: colors.textPrimary }]}>Auto-Lock</Text>
               <Text style={[styles.settingDesc, { color: colors.textTertiary }]}>Lock when app goes to background</Text>
             </View>
             <Switch
-              value={autoLock}
-              onValueChange={setAutoLock}
+              value={autoLockEnabled}
+              onValueChange={(value) => setSecuritySetting('autoLockEnabled', value)}
               trackColor={{ false: colors.border, true: colors.primary + '50' }}
-              thumbColor={autoLock ? colors.primary : colors.textTertiary}
+              thumbColor={autoLockEnabled ? colors.primary : colors.textTertiary}
             />
           </View>
         </View>
@@ -98,33 +154,33 @@ export default function PrivacySecurityScreen() {
         <View style={[styles.section, { backgroundColor: colors.surface }]}>
           <View style={[styles.settingItem, { borderBottomColor: colors.borderLight }]}>
             <View style={styles.settingIcon}>
-              <Ionicons name="time-outline" size={22} color={colors.primary} />
+              <Ionicons name="time-outline" size={22} color={colors.notificationIcon} />
             </View>
             <View style={styles.settingInfo}>
               <Text style={[styles.settingTitle, { color: colors.textPrimary }]}>Save Activity History</Text>
               <Text style={[styles.settingDesc, { color: colors.textTertiary }]}>Keep record of your actions</Text>
             </View>
             <Switch
-              value={saveHistory}
-              onValueChange={setSaveHistory}
+              value={saveActivityHistory}
+              onValueChange={(value) => setSecuritySetting('saveActivityHistory', value)}
               trackColor={{ false: colors.border, true: colors.primary + '50' }}
-              thumbColor={saveHistory ? colors.primary : colors.textTertiary}
+              thumbColor={saveActivityHistory ? colors.primary : colors.textTertiary}
             />
           </View>
 
           <View style={[styles.settingItem, { borderBottomWidth: 0 }]}>
             <View style={styles.settingIcon}>
-              <Ionicons name="analytics-outline" size={22} color={colors.primary} />
+              <Ionicons name="analytics-outline" size={22} color={colors.info} />
             </View>
             <View style={styles.settingInfo}>
               <Text style={[styles.settingTitle, { color: colors.textPrimary }]}>Analytics</Text>
               <Text style={[styles.settingDesc, { color: colors.textTertiary }]}>Help improve Zeni</Text>
             </View>
             <Switch
-              value={analytics}
-              onValueChange={setAnalytics}
+              value={analyticsEnabled}
+              onValueChange={(value) => setSecuritySetting('analyticsEnabled', value)}
               trackColor={{ false: colors.border, true: colors.primary + '50' }}
-              thumbColor={analytics ? colors.primary : colors.textTertiary}
+              thumbColor={analyticsEnabled ? colors.primary : colors.textTertiary}
             />
           </View>
         </View>
@@ -137,7 +193,7 @@ export default function PrivacySecurityScreen() {
             onPress={handleExportData}
           >
             <View style={styles.settingIcon}>
-              <Ionicons name="download-outline" size={22} color={colors.primary} />
+              <Ionicons name="download-outline" size={22} color={colors.uploadedIcon} />
             </View>
             <Text style={[styles.actionText, { color: colors.textPrimary }]}>Export My Data</Text>
             <Ionicons name="chevron-forward" size={20} color={colors.textTertiary} />

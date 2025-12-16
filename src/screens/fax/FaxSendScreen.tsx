@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   TextInput,
   ScrollView,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
@@ -16,6 +17,7 @@ import { spacing, borderRadius, typography } from '../../constants/theme';
 import { useTheme } from '../../context/ThemeContext';
 import { HomeStackParamList, Document } from '../../types';
 import { useDocumentsStore, useFaxStore, useActivityStore, generateId, useUserStore } from '../../store';
+import faxService from '../../utils/faxService';
 
 type NavigationProp = NativeStackNavigationProp<HomeStackParamList, 'FaxSend'>;
 type RouteType = RouteProp<HomeStackParamList, 'FaxSend'>;
@@ -38,9 +40,33 @@ export default function FaxSendScreen() {
   const [coverMessage, setCoverMessage] = useState('');
   const [isSending, setIsSending] = useState(false);
   const [showDocumentPicker, setShowDocumentPicker] = useState(!documentId);
+  const [estimatedCost, setEstimatedCost] = useState<number>(0);
+  const [faxApiMode, setFaxApiMode] = useState<string>('simulation');
 
-  const selectedDocument = documents.find((d) => d.id === selectedDocumentId);
-  const pdfDocuments = documents.filter((d) => d.mimeType === 'application/pdf');
+  const selectedDocument = documents.find((d: Document) => d.id === selectedDocumentId);
+  const pdfDocuments = documents.filter((d: Document) => d.mimeType === 'application/pdf' || d.mimeType?.startsWith('image/'));
+
+  useEffect(() => {
+    setFaxApiMode(faxService.getApiType());
+  }, []);
+
+  useEffect(() => {
+    if (selectedDocument) {
+      const isInternational = faxNumber.startsWith('+') && !faxNumber.startsWith('+1');
+      setEstimatedCost(faxService.estimateCost(selectedDocument.pagesCount, isInternational));
+    }
+  }, [selectedDocument, faxNumber]);
+
+  const validateAndSend = () => {
+    // Validate fax number
+    const validation = faxService.validateFaxNumber(faxNumber);
+    if (!validation.valid) {
+      Alert.alert('Invalid Fax Number', validation.message);
+      return;
+    }
+    
+    handleSend();
+  };
 
   const handleSend = async () => {
     if (!selectedDocumentId || !recipientName || !faxNumber) {
@@ -50,45 +76,59 @@ export default function FaxSendScreen() {
 
     setIsSending(true);
     try {
-      // Simulate sending
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-
-      const faxJobId = generateId();
-      addFaxJob({
-        id: faxJobId,
-        documentId: selectedDocumentId,
-        userId: user?.id || 'guest',
+      // Use fax service to send
+      const result = await faxService.sendFax({
+        documentPath: selectedDocument?.filePath || '',
+        recipientNumber: faxNumber,
         recipientName,
-        recipientFaxNumber: faxNumber,
-        coverPageSubject: coverSubject,
-        coverPageMessage: coverMessage,
-        status: 'pending',
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        coverPage: coverSubject || coverMessage ? {
+          subject: coverSubject,
+          message: coverMessage,
+          fromName: user?.firstName || 'Zeni User',
+        } : undefined,
+        pagesCount: selectedDocument?.pagesCount || 1,
       });
 
-      addActivity({
-        id: generateId(),
-        userId: user?.id || 'guest',
-        type: 'fax',
-        documentId: selectedDocumentId,
-        title: 'Fax sent',
-        description: `Sent to ${recipientName}`,
-        createdAt: new Date(),
-      });
+      if (result.success) {
+        const faxJobId = result.jobId || generateId();
+        addFaxJob({
+          id: faxJobId,
+          documentId: selectedDocumentId,
+          userId: user?.id || 'guest',
+          recipientName,
+          recipientFaxNumber: faxService.formatFaxNumber(faxNumber),
+          coverPageSubject: coverSubject,
+          coverPageMessage: coverMessage,
+          status: 'pending',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        });
 
-      Alert.alert(
-        'Fax Queued',
-        'Your document has been queued for delivery. You can track its status in the Fax Center.',
-        [
-          {
-            text: 'OK',
-            onPress: () => navigation.navigate('HomeScreen'),
-          },
-        ]
-      );
-    } catch (error) {
-      Alert.alert('Error', 'Failed to send fax. Please try again.');
+        addActivity({
+          id: generateId(),
+          userId: user?.id || 'guest',
+          type: 'fax',
+          documentId: selectedDocumentId,
+          title: 'Fax sent',
+          description: `Sent to ${recipientName}`,
+          createdAt: new Date(),
+        });
+
+        Alert.alert(
+          'Fax Queued',
+          `${result.message}\n\nEstimated delivery: ${result.estimatedDeliveryTime || 10} minutes`,
+          [
+            {
+              text: 'OK',
+              onPress: () => navigation.navigate('HomeScreen'),
+            },
+          ]
+        );
+      } else {
+        Alert.alert('Fax Failed', result.message);
+      }
+    } catch (error: any) {
+      Alert.alert('Error', error.message || 'Failed to send fax. Please try again.');
     } finally {
       setIsSending(false);
     }
@@ -125,7 +165,7 @@ export default function FaxSendScreen() {
                 <Text style={styles.emptySubtext}>Scan or upload a document first</Text>
               </View>
             ) : (
-              pdfDocuments.map((doc) => (
+              pdfDocuments.map((doc: Document) => (
                 <TouchableOpacity
                   key={doc.id}
                   style={[
@@ -134,8 +174,8 @@ export default function FaxSendScreen() {
                   ]}
                   onPress={() => handleSelectDocument(doc.id)}
                 >
-                  <View style={styles.documentIcon}>
-                    <Ionicons name="document-text" size={24} color={colors.primary} />
+                  <View style={[styles.documentIcon, { backgroundColor: colors.faxedIcon + '15' }]}>
+                    <Ionicons name="document-text" size={24} color={colors.faxedIcon} />
                   </View>
                   <View style={styles.documentInfo}>
                     <Text style={styles.documentName} numberOfLines={1}>
@@ -144,7 +184,7 @@ export default function FaxSendScreen() {
                     <Text style={styles.documentMeta}>{doc.pagesCount} pages</Text>
                   </View>
                   {selectedDocumentId === doc.id && (
-                    <Ionicons name="checkmark-circle" size={24} color={colors.primary} />
+                    <Ionicons name="checkmark-circle" size={24} color={colors.success} />
                   )}
                 </TouchableOpacity>
               ))
@@ -157,8 +197,8 @@ export default function FaxSendScreen() {
               style={styles.selectedDocument}
               onPress={() => setShowDocumentPicker(true)}
             >
-              <View style={styles.documentIcon}>
-                <Ionicons name="document-text" size={24} color={colors.primary} />
+              <View style={[styles.documentIcon, { backgroundColor: colors.faxedIcon + '15' }]}>
+                <Ionicons name="document-text" size={24} color={colors.faxedIcon} />
               </View>
               <View style={styles.documentInfo}>
                 <Text style={styles.documentName} numberOfLines={1}>
@@ -237,9 +277,24 @@ export default function FaxSendScreen() {
         <View style={styles.infoBox}>
           <Ionicons name="information-circle" size={20} color={colors.info} />
           <Text style={styles.infoText}>
-            Fax delivery typically takes 5-15 minutes. You'll receive a notification once delivered.
+            {faxApiMode === 'simulation' 
+              ? 'Simulation Mode: Faxes will be queued but not actually sent.'
+              : 'Fax delivery typically takes 5-15 minutes. You\'ll receive a notification once delivered.'}
           </Text>
         </View>
+
+        {/* Cost Estimation */}
+        {selectedDocument && estimatedCost > 0 && (
+          <View style={styles.costBox}>
+            <View style={styles.costRow}>
+              <Text style={styles.costLabel}>Estimated Cost:</Text>
+              <Text style={styles.costValue}>${estimatedCost.toFixed(2)}</Text>
+            </View>
+            <Text style={styles.costNote}>
+              Based on {selectedDocument.pagesCount} page(s) at standard rates
+            </Text>
+          </View>
+        )}
       </ScrollView>
 
       {/* Send Button */}
@@ -250,7 +305,7 @@ export default function FaxSendScreen() {
             (!selectedDocumentId || !recipientName || !faxNumber || isSending) &&
               styles.buttonDisabled,
           ]}
-          onPress={handleSend}
+          onPress={validateAndSend}
           disabled={!selectedDocumentId || !recipientName || !faxNumber || isSending}
         >
           <Ionicons
@@ -411,6 +466,34 @@ const createStyles = (colors: any) => StyleSheet.create({
     fontSize: typography.fontSize.sm,
     color: colors.info,
     lineHeight: 20,
+  },
+  costBox: {
+    backgroundColor: colors.surface,
+    marginHorizontal: spacing.xxl,
+    marginTop: spacing.md,
+    padding: spacing.md,
+    borderRadius: borderRadius.md,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  costRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  costLabel: {
+    fontSize: typography.fontSize.md,
+    color: colors.textSecondary,
+  },
+  costValue: {
+    fontSize: typography.fontSize.lg,
+    fontWeight: '600',
+    color: colors.success,
+  },
+  costNote: {
+    fontSize: typography.fontSize.xs,
+    color: colors.textTertiary,
+    marginTop: spacing.xs,
   },
   bottomAction: {
     padding: spacing.xxl,

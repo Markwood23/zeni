@@ -184,7 +184,7 @@ export default function AccountSettingsScreen() {
         <View style={[styles.securitySection, { backgroundColor: colors.surface }]}>
           <TouchableOpacity style={styles.securityItem} onPress={handleChangePassword}>
             <View style={styles.securityIcon}>
-              <Ionicons name="key-outline" size={22} color={colors.primary} />
+              <Ionicons name="key-outline" size={22} color={colors.settingsIcon} />
             </View>
             <Text style={[styles.securityText, { color: colors.textPrimary }]}>Change Password</Text>
             <Ionicons name="chevron-forward" size={20} color={colors.textTertiary} />

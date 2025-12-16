@@ -1,5 +1,6 @@
-import React from 'react';
-import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native';
+import React, { useEffect, useRef } from 'react';
+import { Linking } from 'react-native';
+import { NavigationContainer, DefaultTheme, DarkTheme, NavigationContainerRef } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
@@ -11,11 +12,13 @@ import OnboardingScreen from '../screens/OnboardingScreen';
 import WelcomeScreen from '../screens/auth/WelcomeScreen';
 import SignInScreen from '../screens/auth/SignInScreen';
 import SignUpScreen from '../screens/auth/SignUpScreen';
+import ForgotPasswordScreen from '../screens/auth/ForgotPasswordScreen';
 import HomeScreen from '../screens/home/HomeScreen';
 import DocumentsHubScreen from '../screens/documents/DocumentsHubScreen';
 import AllDocumentsScreen from '../screens/documents/AllDocumentsScreen';
 import DocumentViewScreen from '../screens/documents/DocumentViewScreen';
 import FolderViewScreen from '../screens/documents/FolderViewScreen';
+import SharedFolderViewScreen from '../screens/documents/SharedFolderViewScreen';
 import ActivityScreen from '../screens/ActivityScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import ScanScreen from '../screens/scan/ScanScreen';
@@ -39,6 +42,7 @@ import PrivacySecurityScreen from '../screens/settings/PrivacySecurityScreen';
 import HelpSupportScreen from '../screens/settings/HelpSupportScreen';
 import AboutScreen from '../screens/settings/AboutScreen';
 import AppearanceScreen from '../screens/settings/AppearanceScreen';
+import StudentVerificationScreen from '../screens/settings/StudentVerificationScreen';
 
 import type {
   RootStackParamList,
@@ -62,11 +66,13 @@ function AuthNavigator() {
     <AuthStack.Navigator
       screenOptions={{
         headerShown: false,
+        animation: 'slide_from_right',
       }}
     >
       <AuthStack.Screen name="Welcome" component={WelcomeScreen} />
       <AuthStack.Screen name="SignIn" component={SignInScreen} />
       <AuthStack.Screen name="SignUp" component={SignUpScreen} />
+      <AuthStack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
     </AuthStack.Navigator>
   );
 }
@@ -94,6 +100,7 @@ function HomeNavigator() {
       <HomeStack.Screen name="NotificationCenter" component={NotificationCenterScreen} />
       <HomeStack.Screen name="NotificationDetail" component={NotificationDetailScreen} />
       <HomeStack.Screen name="HelpSupport" component={HelpSupportScreen} />
+      <HomeStack.Screen name="SharedFolderView" component={SharedFolderViewScreen} />
     </HomeStack.Navigator>
   );
 }
@@ -110,6 +117,7 @@ function DocumentsNavigator() {
       <DocumentsStack.Screen name="AllDocuments" component={AllDocumentsScreen} />
       <DocumentsStack.Screen name="DocumentView" component={DocumentViewScreen} />
       <DocumentsStack.Screen name="FolderView" component={FolderViewScreen} />
+      <DocumentsStack.Screen name="SharedFolderView" component={SharedFolderViewScreen} />
     </DocumentsStack.Navigator>
   );
 }
@@ -124,6 +132,7 @@ function ProfileNavigator() {
     >
       <ProfileStack.Screen name="ProfileScreen" component={ProfileScreen} />
       <ProfileStack.Screen name="AccountSettings" component={AccountSettingsScreen} />
+      <ProfileStack.Screen name="StudentVerification" component={StudentVerificationScreen} />
       <ProfileStack.Screen name="Notifications" component={NotificationsScreen} />
       <ProfileStack.Screen name="Storage" component={StorageScreen} />
       <ProfileStack.Screen name="Signatures" component={SignaturesScreen} />
@@ -194,6 +203,54 @@ function MainTabNavigator() {
 export default function AppNavigator() {
   const { isAuthenticated, isOnboarded } = useUserStore();
   const { colors, isDark } = useTheme();
+  const navigationRef = useRef<NavigationContainerRef<RootStackParamList>>(null);
+
+  // Handle deep links for shared folders
+  useEffect(() => {
+    const handleDeepLink = (event: { url: string }) => {
+      const url = event.url;
+      handleShareUrl(url);
+    };
+
+    const handleShareUrl = (url: string) => {
+      // Handle share links: https://zeni.app/share?token=xxx
+      if (url.includes('share')) {
+        try {
+          const urlObj = new URL(url);
+          const token = urlObj.searchParams.get('token');
+          const password = urlObj.searchParams.get('p');
+          
+          if (token && navigationRef.current && isAuthenticated) {
+            // Navigate to the shared folder view
+            navigationRef.current.navigate('Main', {
+              screen: 'Documents',
+              params: {
+                screen: 'SharedFolderView',
+                params: { shareToken: token, password: password || undefined }
+              }
+            } as any);
+          }
+        } catch (e) {
+          console.log('Error parsing share URL:', e);
+        }
+      }
+    };
+
+    // Handle deep links when app is opened from link
+    Linking.getInitialURL().then((url) => {
+      if (url) {
+        // Delay to ensure navigation is ready
+        setTimeout(() => handleShareUrl(url), 500);
+      }
+    });
+
+    // Handle deep links when app is already open
+    const subscription = Linking.addEventListener('url', handleDeepLink);
+
+    return () => {
+      subscription.remove();
+    };
+  }, [isAuthenticated]);
 
   const navigationTheme = {
     dark: isDark,
@@ -208,8 +265,36 @@ export default function AppNavigator() {
     fonts: DefaultTheme.fonts,
   };
 
+  // Deep linking configuration
+  const linking = {
+    prefixes: ['https://zeni.app', 'zeni://'],
+    config: {
+      screens: {
+        Main: {
+          screens: {
+            Documents: {
+              screens: {
+                SharedFolderView: {
+                  path: 'share',
+                  parse: {
+                    shareToken: (token: string) => token,
+                    password: (p: string) => p,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  };
+
   return (
-    <NavigationContainer theme={navigationTheme}>
+    <NavigationContainer 
+      ref={navigationRef}
+      theme={navigationTheme}
+      linking={linking}
+    >
       <RootStack.Navigator screenOptions={{ headerShown: false }}>
         {!isOnboarded ? (
           <RootStack.Screen name="Onboarding" component={OnboardingScreen} />

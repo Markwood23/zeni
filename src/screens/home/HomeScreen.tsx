@@ -21,6 +21,7 @@ import { CompositeNavigationProp } from '@react-navigation/native';
 import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import { MainTabParamList } from '../../types';
 import DocumentThumbnail from '../../components/DocumentThumbnail';
+import { hasPendingVerification, getVerificationStatusMessage } from '../../utils/premiumAccess';
 
 type NavigationProp = CompositeNavigationProp<
   NativeStackNavigationProp<HomeStackParamList, 'HomeScreen'>,
@@ -58,8 +59,8 @@ const actionTiles: ActionTile[] = [
   },
   {
     id: 'ask-ai',
-    title: 'Ask AI',
-    description: 'Summarize, finish wri...',
+    title: 'Ask Zai',
+    description: 'AI assistant for docs',
     route: 'AskAI',
   },
 ];
@@ -179,6 +180,28 @@ export default function HomeScreen() {
           </View>
         )}
 
+        {/* Verification Reminder Banner - Show for pending verification */}
+        {!searchQuery && hasPendingVerification(user) && (
+          <TouchableOpacity 
+            style={[styles.verificationBanner, { backgroundColor: colors.warning + '15', borderColor: colors.warning + '40' }]}
+            onPress={() => navigation.navigate('Profile' as any, { screen: 'StudentVerification' })}
+            activeOpacity={0.8}
+          >
+            <View style={[styles.verificationBannerIcon, { backgroundColor: colors.warning }]}>
+              <Ionicons name="mail-unread" size={20} color="#FFFFFF" />
+            </View>
+            <View style={styles.verificationBannerContent}>
+              <Text style={[styles.verificationBannerTitle, { color: colors.textPrimary }]}>
+                Verify your school email
+              </Text>
+              <Text style={[styles.verificationBannerSubtitle, { color: colors.textSecondary }]} numberOfLines={1}>
+                Check {user?.verification?.verifiedEmail} to unlock premium
+              </Text>
+            </View>
+            <Ionicons name="chevron-forward" size={20} color={colors.warning} />
+          </TouchableOpacity>
+        )}
+
         {/* Action Tiles Grid - Hide when searching */}
         {!searchQuery && (
           <View style={styles.tilesContainer}>
@@ -238,7 +261,7 @@ export default function HomeScreen() {
             </TouchableOpacity>
           ) : (
             <TouchableOpacity onPress={handleMicPress} style={styles.searchMic}>
-              <Ionicons name="mic-outline" size={20} color={colors.primary} />
+              <Ionicons name="mic-outline" size={20} color={colors.accent} />
             </TouchableOpacity>
           )}
         </View>
@@ -310,13 +333,13 @@ export default function HomeScreen() {
             onPress={() => navigation.navigate('Fax' as any)}
           >
             <View style={styles.faxIcon}>
-              <Ionicons name="print" size={24} color={colors.primary} />
+              <Ionicons name="print" size={24} color={colors.faxedIcon} />
             </View>
             <View style={styles.faxContent}>
               <Text style={[styles.faxTitle, { color: colors.textPrimary }]}>Fax Center</Text>
               <Text style={[styles.faxDescription, { color: colors.textTertiary }]}>Send documents to institutions</Text>
             </View>
-            <Ionicons name="chevron-forward" size={20} color={colors.primary} />
+            <Ionicons name="chevron-forward" size={20} color={colors.faxedIcon} />
           </TouchableOpacity>
         )}
       </ScrollView>
@@ -373,16 +396,45 @@ const styles = StyleSheet.create({
   },
   greetingContainer: {
     paddingHorizontal: spacing.xxl,
-    marginBottom: spacing.xxl,
+    marginBottom: spacing.xl,
   },
   greetingName: {
-    fontSize: typography.fontSize.xl,
+    fontSize: typography.fontSize.md,
     marginBottom: spacing.xs,
   },
   greetingQuestion: {
-    fontSize: typography.fontSize.xxxl,
+    fontSize: typography.fontSize.xxl,
     fontWeight: '700',
-    lineHeight: 42,
+    lineHeight: 32,
+  },
+  verificationBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginHorizontal: spacing.xxl,
+    marginBottom: spacing.xl,
+    padding: spacing.md,
+    borderRadius: borderRadius.lg,
+    borderWidth: 1,
+  },
+  verificationBannerIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  verificationBannerContent: {
+    flex: 1,
+    marginLeft: spacing.md,
+    marginRight: spacing.sm,
+  },
+  verificationBannerTitle: {
+    fontSize: typography.fontSize.sm,
+    fontWeight: '600',
+    marginBottom: 2,
+  },
+  verificationBannerSubtitle: {
+    fontSize: typography.fontSize.xs,
   },
   tilesContainer: {
     paddingHorizontal: spacing.xxl,

@@ -1,15 +1,13 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Zeni Terms of Service - Read our terms and conditions.">
     <title>Terms of Service - Zeni</title>
     
-    <!-- Favicon -->
-    <link rel="icon" type="image/png" href="assets/favicon.png">
-    
-    <!-- Fonts -->
+    <link rel="icon" type="image/svg+xml" href="assets/zeni-icon.svg">
+    <link rel="apple-touch-icon" href="assets/icon.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -19,52 +17,67 @@
         .legal-page {
             padding-top: 100px;
             min-height: 100vh;
+            background: var(--bg);
         }
         .legal-container {
-            max-width: 800px;
+            max-width: 720px;
             margin: 0 auto;
-            padding: 2rem;
+            padding: 40px 24px 80px;
+        }
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 32px;
+            transition: color 0.2s;
+        }
+        .back-link:hover {
+            color: var(--text);
         }
         .legal-header {
-            margin-bottom: 3rem;
-            text-align: center;
+            margin-bottom: 48px;
         }
         .legal-header h1 {
-            font-size: 2.5rem;
+            font-size: 36px;
             font-weight: 700;
-            margin-bottom: 0.5rem;
+            margin-bottom: 8px;
+            color: var(--text);
         }
         .legal-header .last-updated {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
+            color: var(--text-muted);
+            font-size: 14px;
         }
         .legal-content h2 {
-            font-size: 1.5rem;
+            font-size: 20px;
             font-weight: 600;
-            margin-top: 2.5rem;
-            margin-bottom: 1rem;
-            color: var(--text-primary);
+            margin-top: 40px;
+            margin-bottom: 16px;
+            color: var(--text);
         }
         .legal-content h3 {
-            font-size: 1.1rem;
+            font-size: 16px;
             font-weight: 600;
-            margin-top: 1.5rem;
-            margin-bottom: 0.75rem;
-            color: var(--text-primary);
+            margin-top: 24px;
+            margin-bottom: 12px;
+            color: var(--text);
         }
         .legal-content p {
             color: var(--text-secondary);
-            line-height: 1.8;
-            margin-bottom: 1rem;
+            line-height: 1.7;
+            margin-bottom: 16px;
         }
         .legal-content ul, .legal-content ol {
             color: var(--text-secondary);
-            line-height: 1.8;
-            margin-bottom: 1rem;
-            padding-left: 1.5rem;
+            line-height: 1.7;
+            margin-bottom: 16px;
+            padding-left: 24px;
         }
         .legal-content li {
-            margin-bottom: 0.5rem;
+            margin-bottom: 8px;
         }
         .legal-content a {
             color: var(--primary);
@@ -75,61 +88,77 @@
         }
         .highlight-box {
             background: var(--surface);
-            border-left: 4px solid var(--primary);
-            padding: 1rem 1.5rem;
-            margin: 1.5rem 0;
-            border-radius: 0 8px 8px 0;
+            border: 1px solid var(--border);
+            border-left: 3px solid var(--primary);
+            padding: 16px 20px;
+            margin: 24px 0;
+            border-radius: 0 12px 12px 0;
         }
         .highlight-box p {
             margin: 0;
+            font-size: 14px;
         }
         .warning-box {
-            background: #FEF3C7;
-            border-left: 4px solid #F59E0B;
-            padding: 1rem 1.5rem;
-            margin: 1.5rem 0;
-            border-radius: 0 8px 8px 0;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-left: 3px solid #F59E0B;
+            padding: 16px 20px;
+            margin: 24px 0;
+            border-radius: 0 12px 12px 0;
         }
         .warning-box p {
             margin: 0;
-            color: #92400E;
-        }
-        @media (prefers-color-scheme: dark) {
-            .warning-box {
-                background: #78350F;
-            }
-            .warning-box p {
-                color: #FEF3C7;
-            }
-        }
-        .back-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: var(--primary);
-            text-decoration: none;
-            font-weight: 500;
-            margin-bottom: 2rem;
-        }
-        .back-link:hover {
-            text-decoration: underline;
+            font-size: 14px;
+            color: var(--text-secondary);
         }
     </style>
 </head>
 <body>
     <!-- Navigation -->
     <nav class="navbar">
-        <div class="container nav-container">
+        <div class="nav-container">
             <a href="index.html" class="logo">
-                <span class="logo-icon">Z</span>
-                <span class="logo-text">Zeni</span>
+                <img src="assets/icon.png" alt="Zeni" class="logo-img">
+                <span>Zeni</span>
             </a>
             <div class="nav-links">
                 <a href="index.html#features">Features</a>
-                <a href="index.html#download" class="btn btn-primary btn-sm">Download</a>
+                <a href="index.html#how-it-works">How it works</a>
+                <a href="index.html#download">Download</a>
             </div>
+            <div class="nav-actions">
+                <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+                    <svg class="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="5"/>
+                        <line x1="12" y1="1" x2="12" y2="3"/>
+                        <line x1="12" y1="21" x2="12" y2="23"/>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+                        <line x1="1" y1="12" x2="3" y2="12"/>
+                        <line x1="21" y1="12" x2="23" y2="12"/>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+                    </svg>
+                    <svg class="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                    </svg>
+                </button>
+                <a href="index.html#download" class="btn btn-primary">Get the App</a>
+            </div>
+            <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
         </div>
     </nav>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+        <a href="index.html#features">Features</a>
+        <a href="index.html#how-it-works">How it works</a>
+        <a href="index.html#download">Download</a>
+    </div>
 
     <main class="legal-page">
         <div class="legal-container">
@@ -308,9 +337,15 @@
     <footer class="footer">
         <div class="container">
             <div class="footer-bottom" style="border-top: none; padding-top: 0;">
-                <p>&copy; 2025 Zeni. Made with ❤️ in Ghana.</p>
+                <p>© 2025 Zeni. Made with ❤️ in Ghana</p>
+                <div class="social-links">
+                    <a href="privacy.html">Privacy</a>
+                    <a href="terms.html">Terms</a>
+                </div>
             </div>
         </div>
     </footer>
+
+    <script src="script.js"></script>
 </body>
 </html>

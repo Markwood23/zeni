@@ -1,15 +1,18 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Zeni - The smart document workspace built for Ghanaian students.">
+    <meta name="description" content="Zeni - The smart document workspace built for Ghanaian students. Scan, edit, convert, and fax documents.">
     <title>Zeni - Smart Document Workspace for Students</title>
     
-    <link rel="icon" type="image/png" href="assets/favicon.png">
+    <link rel="icon" type="image/svg+xml" href="assets/zeni-icon.svg">
+    <link rel="apple-touch-icon" href="assets/icon.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
     
     <link rel="stylesheet" href="styles.css">
 </head>
@@ -18,8 +21,7 @@
     <nav class="navbar">
         <div class="nav-container">
             <a href="#" class="logo">
-                <img src="assets/icon.png" alt="Zeni" class="logo-img">
-                <span>Zeni</span>
+                <span class="logo-z">Z</span><span class="logo-eni">eni</span>
             </a>
             <div class="nav-links">
                 <a href="#features">Features</a>
@@ -60,7 +62,7 @@
         <a href="#download">Download</a>
         <div class="mobile-menu-footer">
             <button class="theme-toggle-mobile" id="themeToggleMobile">
-                <span class="theme-icon">🌙</span>
+                <span class="theme-icon"></span>
                 <span>Toggle theme</span>
             </button>
         </div>
@@ -70,59 +72,109 @@
     <section class="hero">
         <div class="hero-container">
             <div class="hero-badge">
-                <span class="badge-icon">🇬🇭</span>
+                <span class="badge-icon"><ion-icon name="flag"></ion-icon></span>
                 <span>Built for Ghanaian students</span>
             </div>
             <h1 class="hero-title">
-                Your documents,<br>
-                <span class="gradient-text">always organized</span>
+                <span class="hero-title-line">Document Management,</span>
+                <span class="hero-title-line">Made Simple.</span>
             </h1>
             <p class="hero-subtitle">
                 Scan, edit, convert, and fax documents right from your phone. 
-                The only document app you'll ever need.
+                The smartest way for students to handle paperwork.
             </p>
-            <div class="hero-actions">
-                <a href="#download" class="btn btn-primary btn-lg">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                        <polyline points="7 10 12 15 17 10"/>
-                        <line x1="12" y1="15" x2="12" y2="3"/>
-                    </svg>
-                    Download Free
-                </a>
-                <a href="#features" class="btn btn-ghost btn-lg">
-                    Learn more
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <line x1="5" y1="12" x2="19" y2="12"/>
-                        <polyline points="12 5 19 12 12 19"/>
-                    </svg>
-                </a>
+            
+            <!-- Email Signup -->
+            <form class="hero-form" action="#" method="POST">
+                <input type="email" placeholder="Enter your email" required>
+                <button type="submit" class="btn btn-primary">Get Started</button>
+            </form>
+        </div>
+        
+        <!-- Floating Elements - Spread across hero -->
+        <div class="floating-element element-1">
+            <div class="float-card">
+                <div class="float-image green-bg">
+                    <div class="product-bottle"></div>
+                </div>
+                <span class="float-time">2:01</span>
             </div>
-            <div class="hero-stats">
-                <div class="stat">
-                    <span class="stat-value">10K+</span>
-                    <span class="stat-label">Active users</span>
+        </div>
+        
+        <div class="floating-element element-2">
+            <div class="float-card">
+                <div class="float-image blue-bg">
+                    <div class="doc-icon-big"></div>
                 </div>
-                <div class="stat-divider"></div>
-                <div class="stat">
-                    <span class="stat-value">50K+</span>
-                    <span class="stat-label">Documents scanned</span>
-                </div>
-                <div class="stat-divider"></div>
-                <div class="stat">
-                    <span class="stat-value">4.8</span>
-                    <span class="stat-label">App rating</span>
+                <div class="float-tag">
+                    <span class="tag-number">8</span>
+                    <span class="tag-text">items<br><small>Scanned today</small></span>
                 </div>
             </div>
         </div>
+        
+        <div class="floating-element element-3">
+            <div class="mini-stats">
+                <div class="mini-bars">
+                    <div class="mini-bar" style="height: 16px;"></div>
+                    <div class="mini-bar" style="height: 24px;"></div>
+                    <div class="mini-bar" style="height: 32px;"></div>
+                </div>
+                <div class="mini-stats-text">
+                    <span class="mini-label">Documents</span>
+                    <span class="mini-value">40% <ion-icon name="arrow-up"></ion-icon></span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="floating-element element-4">
+            <div class="star-badge">
+                <ion-icon name="star"></ion-icon>
+                <ion-icon name="star"></ion-icon>
+                <ion-icon name="star"></ion-icon>
+                <ion-icon name="star"></ion-icon>
+                <ion-icon name="star"></ion-icon>
+            </div>
+        </div>
+        
+        <div class="floating-element element-5">
+            <div class="float-card small">
+                <div class="float-image purple-bg">
+                    <div class="folder-icon-big"></div>
+                </div>
+                <div class="float-likes">
+                    <span class="like-count">1.5k</span>
+                    <div class="like-icons">
+                        <ion-icon name="heart"></ion-icon>
+                        <ion-icon name="chatbubble"></ion-icon>
+                        <ion-icon name="share-social"></ion-icon>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
         <div class="hero-bg-elements">
-            <div class="bg-circle bg-circle-1"></div>
-            <div class="bg-circle bg-circle-2"></div>
+            <div class="bg-gradient-orb orb-1"></div>
+            <div class="bg-gradient-orb orb-2"></div>
             <div class="bg-grid"></div>
         </div>
     </section>
 
-    <!-- Features Section - Bento Grid -->
+    <!-- Trust Section -->
+    <section class="trust-section">
+        <div class="trust-container">
+            <p class="trust-label">Trusted by students at</p>
+            <div class="trust-logos">
+                <span class="trust-logo">University of Ghana</span>
+                <span class="trust-logo">KNUST</span>
+                <span class="trust-logo">Ashesi</span>
+                <span class="trust-logo">UCC</span>
+                <span class="trust-logo">GIMPA</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section - Colorful Bento Grid -->
     <section id="features" class="features">
         <div class="container">
             <div class="section-header">
@@ -132,15 +184,11 @@
             </div>
             
             <div class="bento-grid">
-                <!-- Large Feature Card - Scan -->
-                <div class="bento-card bento-large card-scan">
+                <!-- Scan Card - Green -->
+                <div class="bento-card bento-large card-scan card-green">
                     <div class="card-content">
                         <div class="card-icon">
-                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <rect x="3" y="3" width="18" height="18" rx="2"/>
-                                <circle cx="8.5" cy="8.5" r="1.5"/>
-                                <path d="M21 15l-5-5L5 21"/>
-                            </svg>
+                            <ion-icon name="scan-outline" style="font-size: 28px;"></ion-icon>
                         </div>
                         <h3>Smart Document Scanning</h3>
                         <p>Point your camera at any document. Our AI automatically detects edges, corrects perspective, and enhances clarity.</p>
@@ -153,72 +201,79 @@
                                 <div class="scan-corner bl"></div>
                                 <div class="scan-corner br"></div>
                                 <div class="scan-line"></div>
+                                <div class="scanned-doc">
+                                    <div class="doc-line"></div>
+                                    <div class="doc-line short"></div>
+                                    <div class="doc-line"></div>
+                                    <div class="doc-line medium"></div>
+                                    <div class="doc-line short"></div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Medium Card - Edit -->
-                <div class="bento-card bento-medium card-edit">
+                <!-- Edit Card - Purple -->
+                <div class="bento-card bento-medium card-edit card-purple">
                     <div class="card-icon">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-                        </svg>
+                        <ion-icon name="create-outline" style="font-size: 24px;"></ion-icon>
                     </div>
                     <h3>Edit & Sign</h3>
                     <p>Add text, draw signatures, annotate PDFs. Full editing without leaving the app.</p>
                     <div class="card-visual-inline">
                         <div class="signature-line">
-                            <svg viewBox="0 0 120 40" class="signature-svg">
-                                <path d="M10 30 Q30 10 50 25 T90 20 T110 30" fill="none" stroke="currentColor" stroke-width="2"/>
+                            <svg viewBox="0 0 120 40" class="signature-svg animated-signature">
+                                <path class="signature-path" d="M10 30 Q30 10 50 25 T90 20 T110 30" fill="none" stroke="currentColor" stroke-width="2"/>
                             </svg>
+                            <div class="pen-cursor">
+                                <ion-icon name="pencil"></ion-icon>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Medium Card - Convert -->
-                <div class="bento-card bento-medium card-convert">
+                <!-- Convert Card - Yellow -->
+                <div class="bento-card bento-medium card-convert card-yellow">
                     <div class="card-icon">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M17 1l4 4-4 4"/>
-                            <path d="M3 11V9a4 4 0 0 1 4-4h14"/>
-                            <path d="M7 23l-4-4 4-4"/>
-                            <path d="M21 13v2a4 4 0 0 1-4 4H3"/>
-                        </svg>
+                        <ion-icon name="swap-horizontal-outline" style="font-size: 24px;"></ion-icon>
                     </div>
                     <h3>Convert Files</h3>
                     <p>PDF ↔ Image, Word → PDF, and more. Any format you need, instantly.</p>
                     <div class="card-visual-inline">
                         <div class="convert-animation">
-                            <span class="file-badge">PDF</span>
-                            <span class="convert-arrow">→</span>
-                            <span class="file-badge alt">IMG</span>
+                            <span class="file-badge format-from format-pdf">PDF</span>
+                            <span class="convert-arrow"><ion-icon name="arrow-forward"></ion-icon></span>
+                            <span class="file-badge alt format-to format-img">IMG</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- Large Feature Card - Fax -->
-                <div class="bento-card bento-large card-fax">
+                <!-- Fax Card - Dark -->
+                <div class="bento-card bento-large card-fax card-dark">
                     <div class="card-content">
                         <div class="card-icon">
-                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.362 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
-                            </svg>
+                            <ion-icon name="call-outline" style="font-size: 28px;"></ion-icon>
                         </div>
                         <h3>Send Fax Worldwide</h3>
                         <p>Need to fax a document? Send faxes to any number globally without a fax machine. Perfect for official submissions.</p>
-                        <div class="fax-indicator">
-                            <span class="pulse"></span>
-                            <span>Sending to +1 (555) 123-4567</span>
-                        </div>
                     </div>
                     <div class="card-visual">
-                        <div class="world-map">
-                            <div class="map-dot dot-1"></div>
-                            <div class="map-dot dot-2"></div>
-                            <div class="map-dot dot-3"></div>
-                            <div class="map-line"></div>
+                        <div class="fax-status">
+                            <div class="fax-row">
+                                <span class="fax-label">To</span>
+                                <span class="fax-value fax-number">+1 (555) 123-4567</span>
+                            </div>
+                            <div class="fax-row">
+                                <span class="fax-label">Pages</span>
+                                <span class="fax-value fax-pages">3</span>
+                            </div>
+                            <div class="fax-row">
+                                <span class="fax-label">Status</span>
+                                <span class="fax-status-badge"><span class="status-dot"></span><span class="fax-status-text">Sending...</span></span>
+                            </div>
+                            <div class="fax-progress">
+                                <div class="fax-progress-bar"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -240,11 +295,7 @@
                     <div class="step-visual">
                         <div class="step-icon-wrapper">
                             <div class="step-number">1</div>
-                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                                <polyline points="7 10 12 15 17 10"/>
-                                <line x1="12" y1="15" x2="12" y2="3"/>
-                            </svg>
+                            <ion-icon name="download-outline" style="font-size: 32px;"></ion-icon>
                         </div>
                     </div>
                     <div class="step-content">
@@ -263,11 +314,7 @@
                     <div class="step-visual">
                         <div class="step-icon-wrapper">
                             <div class="step-number">2</div>
-                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                                <rect x="3" y="3" width="18" height="18" rx="2"/>
-                                <circle cx="8.5" cy="8.5" r="1.5"/>
-                                <path d="M21 15l-5-5L5 21"/>
-                            </svg>
+                            <ion-icon name="camera-outline" style="font-size: 32px;"></ion-icon>
                         </div>
                     </div>
                     <div class="step-content">
@@ -286,10 +333,7 @@
                     <div class="step-visual">
                         <div class="step-icon-wrapper">
                             <div class="step-number">3</div>
-                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-                                <polyline points="22 4 12 14.01 9 11.01"/>
-                            </svg>
+                            <ion-icon name="checkmark-circle-outline" style="font-size: 32px;"></ion-icon>
                         </div>
                     </div>
                     <div class="step-content">
@@ -305,31 +349,182 @@
     <section class="ai-section">
         <div class="container">
             <div class="ai-card">
-                <div class="ai-content">
-                    <div class="ai-badge">
-                        <span class="sparkle">✨</span>
-                        <span>AI-Powered</span>
+                <div class="ai-header">
+                    <span class="ai-icon"><ion-icon name="sparkles"></ion-icon></span>
+                    <span class="ai-label">AI Assistant</span>
+                </div>
+                <h2>Understand your documents instantly</h2>
+                <p>Summarize, extract, translate, or ask questions. Get answers in seconds.</p>
+                <div class="ai-demo">
+                    <div class="ai-prompt">
+                        <span class="prompt-icon"><ion-icon name="arrow-forward"></ion-icon></span>
+                        <span>"What are the key terms in this contract?"</span>
                     </div>
-                    <h2>Ask AI anything about your documents</h2>
-                    <p>Summarize lengthy PDFs, extract key information, translate text, or ask questions about your documents. Our AI assistant understands context and delivers accurate answers.</p>
-                    <div class="ai-chat-preview">
-                        <div class="chat-bubble user">
-                            <span>Summarize this contract for me</span>
-                        </div>
-                        <div class="chat-bubble ai">
-                            <span>This is a 12-month lease agreement for a property at... The monthly rent is GH₵2,500 with a security deposit of...</span>
-                            <div class="typing-indicator">
-                                <span></span><span></span><span></span>
-                            </div>
+                    <div class="ai-response">
+                        <p><strong>Key terms identified:</strong></p>
+                        <ul>
+                            <li>12-month duration</li>
+                            <li>GH₵2,500/month rent</li>
+                            <li>30-day notice period</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats-section">
+        <div class="container">
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-number" data-target="1000000">0</div>
+                    <div class="stat-suffix">+</div>
+                    <div class="stat-label">Documents Scanned</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" data-target="50000">0</div>
+                    <div class="stat-suffix">+</div>
+                    <div class="stat-label">Happy Students</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" data-target="4.8" data-decimal="true">0</div>
+                    <div class="stat-suffix"><ion-icon name="star"></ion-icon></div>
+                    <div class="stat-label">App Store Rating</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" data-target="100">0</div>
+                    <div class="stat-suffix">+</div>
+                    <div class="stat-label">Universities</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="testimonials-section">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-label">Testimonials</span>
+                <h2 class="section-title">Loved by students everywhere</h2>
+                <p class="section-subtitle">See what our users have to say about Zeni</p>
+            </div>
+            
+            <div class="testimonials-grid">
+                <div class="testimonial-card">
+                    <div class="testimonial-rating">
+                        <ion-icon name="star"></ion-icon>
+                        <ion-icon name="star"></ion-icon>
+                        <ion-icon name="star"></ion-icon>
+                        <ion-icon name="star"></ion-icon>
+                        <ion-icon name="star"></ion-icon>
+                    </div>
+                    <p class="testimonial-text">"Zeni saved my life during finals! I scanned all my handwritten notes and the AI helped me create study summaries. Absolute game-changer."</p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">AK</div>
+                        <div class="author-info">
+                            <div class="author-name">Akua Mensah</div>
+                            <div class="author-title">Medical Student, UG</div>
                         </div>
                     </div>
                 </div>
-                <div class="ai-visual">
-                    <div class="ai-orb">
-                        <div class="orb-ring ring-1"></div>
-                        <div class="orb-ring ring-2"></div>
-                        <div class="orb-ring ring-3"></div>
-                        <div class="orb-core"></div>
+
+                <div class="testimonial-card featured">
+                    <div class="testimonial-rating">
+                        <ion-icon name="star"></ion-icon>
+                        <ion-icon name="star"></ion-icon>
+                        <ion-icon name="star"></ion-icon>
+                        <ion-icon name="star"></ion-icon>
+                        <ion-icon name="star"></ion-icon>
+                    </div>
+                    <p class="testimonial-text">"Finally, a document app that doesn't bombard me with ads! The fax feature helped me submit my internship documents without any hassle. Clean, fast, and actually useful."</p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">KO</div>
+                        <div class="author-info">
+                            <div class="author-name">Kofi Owusu</div>
+                            <div class="author-title">Engineering Student, KNUST</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="testimonial-card">
+                    <div class="testimonial-rating">
+                        <ion-icon name="star"></ion-icon>
+                        <ion-icon name="star"></ion-icon>
+                        <ion-icon name="star"></ion-icon>
+                        <ion-icon name="star"></ion-icon>
+                        <ion-icon name="star"></ion-icon>
+                    </div>
+                    <p class="testimonial-text">"The PDF to Word conversion is incredibly accurate. I use it daily for my research papers. Best part? It works offline too!"</p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">EA</div>
+                        <div class="author-info">
+                            <div class="author-name">Esi Asante</div>
+                            <div class="author-title">Law Student, GIMPA</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="faq-section">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-label">FAQ</span>
+                <h2 class="section-title">Frequently asked questions</h2>
+                <p class="section-subtitle">Everything you need to know about Zeni</p>
+            </div>
+            
+            <div class="faq-container">
+                <div class="faq-item">
+                    <button class="faq-question">
+                        <span>Is Zeni really free?</span>
+                        <ion-icon name="chevron-down-outline" class="faq-icon"></ion-icon>
+                    </button>
+                    <div class="faq-answer">
+                        <p>Yes! Zeni is completely free to download and use. We offer a Pro version with advanced features like unlimited cloud storage and priority AI processing, but the core scanning, editing, and conversion features are always free.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question">
+                        <span>Does Zeni work offline?</span>
+                        <ion-icon name="chevron-down-outline" class="faq-icon"></ion-icon>
+                    </button>
+                    <div class="faq-answer">
+                        <p>Absolutely! You can scan, edit, and organize documents without an internet connection. Only features like cloud sync, faxing, and AI assistance require connectivity.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question">
+                        <span>How secure are my documents?</span>
+                        <ion-icon name="chevron-down-outline" class="faq-icon"></ion-icon>
+                    </button>
+                    <div class="faq-answer">
+                        <p>Your documents are encrypted with bank-level AES-256 encryption. We never access or share your files. You can also enable biometric lock for extra security.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question">
+                        <span>What file formats does Zeni support?</span>
+                        <ion-icon name="chevron-down-outline" class="faq-icon"></ion-icon>
+                    </button>
+                    <div class="faq-answer">
+                        <p>Zeni supports PDF, JPEG, PNG, Word (DOCX), Excel (XLSX), and more. You can easily convert between formats with just a few taps.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question">
+                        <span>Can I fax documents internationally?</span>
+                        <ion-icon name="chevron-down-outline" class="faq-icon"></ion-icon>
+                    </button>
+                    <div class="faq-answer">
+                        <p>Yes! Zeni supports faxing to over 100 countries worldwide. Perfect for sending official documents to embassies, universities, or businesses abroad.</p>
                     </div>
                 </div>
             </div>
@@ -367,15 +562,7 @@
                 <div class="download-visual">
                     <div class="qr-code">
                         <div class="qr-placeholder">
-                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                                <rect x="3" y="3" width="7" height="7"/>
-                                <rect x="14" y="3" width="7" height="7"/>
-                                <rect x="3" y="14" width="7" height="7"/>
-                                <rect x="14" y="14" width="3" height="3"/>
-                                <rect x="18" y="14" width="3" height="3"/>
-                                <rect x="14" y="18" width="3" height="3"/>
-                                <rect x="18" y="18" width="3" height="3"/>
-                            </svg>
+                            <ion-icon name="qr-code-outline" style="font-size: 48px;"></ion-icon>
                         </div>
                         <span>Scan to download</span>
                     </div>
@@ -390,8 +577,7 @@
             <div class="footer-main">
                 <div class="footer-brand">
                     <a href="#" class="logo">
-                        <img src="assets/icon.png" alt="Zeni" class="logo-img">
-                        <span>Zeni</span>
+                        <span class="logo-z">Z</span><span class="logo-eni">eni</span>
                     </a>
                     <p>Smart document workspace for students. Scan, edit, convert, and fax—all in one app.</p>
                 </div>
@@ -404,8 +590,8 @@
                     </div>
                     <div class="footer-col">
                         <h4>Company</h4>
-                        <a href="mailto:support@zenigh.online">Contact</a>
-                        <a href="#">Careers</a>
+                        <a href="contact.html">Contact</a>
+                        <a href="careers.html">Careers</a>
                     </div>
                     <div class="footer-col">
                         <h4>Legal</h4>
@@ -415,24 +601,16 @@
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>© 2025 Zeni. Made with ❤️ in Ghana</p>
+                <p>© 2025 Zeni. Made with <ion-icon name="heart" class="footer-heart"></ion-icon> in Ghana</p>
                 <div class="social-links">
-                    <a href="#" aria-label="Twitter">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-                        </svg>
+                    <a href="https://twitter.com/zaboraghana" aria-label="Twitter">
+                        <ion-icon name="logo-twitter" style="font-size: 20px;"></ion-icon>
                     </a>
-                    <a href="#" aria-label="Instagram">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <rect x="2" y="2" width="20" height="20" rx="5"/>
-                            <circle cx="12" cy="12" r="4"/>
-                            <circle cx="18" cy="6" r="1"/>
-                        </svg>
+                    <a href="https://instagram.com/zaboraghana" aria-label="Instagram">
+                        <ion-icon name="logo-instagram" style="font-size: 20px;"></ion-icon>
                     </a>
-                    <a href="#" aria-label="LinkedIn">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
-                        </svg>
+                    <a href="https://linkedin.com/company/zabora" aria-label="LinkedIn">
+                        <ion-icon name="logo-linkedin" style="font-size: 20px;"></ion-icon>
                     </a>
                 </div>
             </div>

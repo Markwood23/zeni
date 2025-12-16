@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 28" fill="none">
+  <!-- Zeni Logo - Simple Clean Wordmark -->
+  
+  <!-- Z - Blue, slightly italic -->
+  <text x="0" y="22" font-family="Inter, Arial, sans-serif" font-size="26" font-weight="700" font-style="italic" fill="#017DE9">Z</text>
+  
+  <!-- eni - Dark -->
+  <text x="16" y="22" font-family="Inter, Arial, sans-serif" font-size="26" font-weight="600" fill="#1a1a1a">eni</text>
+</svg>

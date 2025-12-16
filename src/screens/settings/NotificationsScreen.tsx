@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   View,
   Text,
@@ -12,74 +12,71 @@ import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { spacing, borderRadius, typography } from '../../constants/theme';
 import { useTheme } from '../../context/ThemeContext';
+import { useSettingsStore } from '../../store';
 
 export default function NotificationsScreen() {
   const navigation = useNavigation();
   const { colors } = useTheme();
   
-  const [pushEnabled, setPushEnabled] = useState(true);
-  const [emailEnabled, setEmailEnabled] = useState(true);
-  const [scanComplete, setScanComplete] = useState(true);
-  const [faxStatus, setFaxStatus] = useState(true);
-  const [aiResponses, setAiResponses] = useState(true);
-  const [tips, setTips] = useState(false);
-  const [updates, setUpdates] = useState(true);
+  const {
+    pushNotificationsEnabled,
+    emailNotificationsEnabled,
+    scanCompleteNotifications,
+    faxStatusNotifications,
+    aiResponseNotifications,
+    tipsNotifications,
+    updateNotifications,
+    setNotificationSetting,
+  } = useSettingsStore();
 
   const notifications = [
     {
-      id: 'push',
+      id: 'pushNotificationsEnabled',
       title: 'Push Notifications',
       description: 'Receive notifications on your device',
-      value: pushEnabled,
-      onChange: setPushEnabled,
+      value: pushNotificationsEnabled,
     },
     {
-      id: 'email',
+      id: 'emailNotificationsEnabled',
       title: 'Email Notifications',
       description: 'Receive updates via email',
-      value: emailEnabled,
-      onChange: setEmailEnabled,
+      value: emailNotificationsEnabled,
     },
   ];
 
   const activityNotifications = [
     {
-      id: 'scan',
+      id: 'scanCompleteNotifications',
       title: 'Scan Complete',
       description: 'When document scanning finishes',
-      value: scanComplete,
-      onChange: setScanComplete,
+      value: scanCompleteNotifications,
     },
     {
-      id: 'fax',
+      id: 'faxStatusNotifications',
       title: 'Fax Status',
       description: 'Updates on fax delivery',
-      value: faxStatus,
-      onChange: setFaxStatus,
+      value: faxStatusNotifications,
     },
     {
-      id: 'ai',
+      id: 'aiResponseNotifications',
       title: 'AI Responses',
       description: 'When AI finishes processing',
-      value: aiResponses,
-      onChange: setAiResponses,
+      value: aiResponseNotifications,
     },
   ];
 
   const otherNotifications = [
     {
-      id: 'tips',
+      id: 'tipsNotifications',
       title: 'Tips & Tutorials',
       description: 'Learn how to use Zeni better',
-      value: tips,
-      onChange: setTips,
+      value: tipsNotifications,
     },
     {
-      id: 'updates',
+      id: 'updateNotifications',
       title: 'App Updates',
       description: 'New features and improvements',
-      value: updates,
-      onChange: setUpdates,
+      value: updateNotifications,
     },
   ];
 
@@ -94,7 +91,7 @@ export default function NotificationsScreen() {
       </View>
       <Switch
         value={item.value}
-        onValueChange={item.onChange}
+        onValueChange={(value) => setNotificationSetting(item.id, value)}
         trackColor={{ false: colors.border, true: colors.primary + '50' }}
         thumbColor={item.value ? colors.primary : colors.textTertiary}
       />

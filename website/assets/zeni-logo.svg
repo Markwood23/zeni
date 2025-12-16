@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 70 24">
+  <!-- Zeni Logo - Clean Minimalistic Wordmark -->
+  <style>
+    .logo-z { fill: #017DE9; font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; font-size: 24px; font-weight: 800; font-style: italic; }
+    .logo-eni { fill: #1a1a1a; font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; font-size: 24px; font-weight: 600; }
+  </style>
+  <text x="0" y="19" class="logo-z">Z</text>
+  <text x="14" y="19" class="logo-eni">eni</text>
+</svg>

@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shared Folder - Zeni</title>
+    <link rel="icon" type="image/png" href="assets/favicon.png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #f8f9ff 0%, #f0f4ff 100%);
+            min-height: 100vh;
+            color: #1a1a2e;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 0;
+            border-bottom: 1px solid rgba(79, 70, 229, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 20px;
+        }
+
+        .logo-text {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1a1a2e;
+        }
+
+        .download-btn {
+            background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+        }
+
+        /* Loading State */
+        .loading-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 80px 20px;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(79, 70, 229, 0.1);
+            border-top-color: #4F46E5;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            margin-top: 20px;
+            color: #6b7280;
+            font-size: 16px;
+        }
+
+        /* Password Protection */
+        .password-container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            text-align: center;
+            max-width: 400px;
+            margin: 60px auto;
+        }
+
+        .password-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 36px;
+        }
+
+        .password-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .password-subtitle {
+            color: #6b7280;
+            margin-bottom: 24px;
+        }
+
+        .password-input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            font-size: 16px;
+            margin-bottom: 16px;
+            transition: border-color 0.2s;
+        }
+
+        .password-input:focus {
+            outline: none;
+            border-color: #4F46E5;
+        }
+
+        .unlock-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
+            color: white;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .unlock-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+        }
+
+        .error-text {
+            color: #EF4444;
+            font-size: 14px;
+            margin-top: 12px;
+        }
+
+        /* Folder Content */
+        .folder-header {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            margin-bottom: 24px;
+        }
+
+        .folder-meta {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .folder-icon {
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, #EEF2FF 0%, #E0E7FF 100%);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+        }
+
+        .folder-info h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .folder-stats {
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        .shared-by {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 16px;
+            background: #F9FAFB;
+            border-radius: 10px;
+            font-size: 14px;
+            color: #6b7280;
+        }
+
+        .shared-by-avatar {
+            width: 28px;
+            height: 28px;
+            background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 12px;
+        }
+
+        .access-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: #ECFDF5;
+            color: #059669;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+            margin-left: auto;
+        }
+
+        /* Documents List */
+        .documents-section {
+            background: white;
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .documents-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .document-item {
+            display: flex;
+            align-items: center;
+            padding: 16px;
+            border-radius: 12px;
+            transition: background 0.2s;
+            cursor: pointer;
+        }
+
+        .document-item:hover {
+            background: #F9FAFB;
+        }
+
+        .document-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 16px;
+            font-size: 24px;
+        }
+
+        .document-icon.pdf { background: #FEE2E2; }
+        .document-icon.image { background: #DBEAFE; }
+        .document-icon.doc { background: #E0E7FF; }
+        .document-icon.other { background: #F3F4F6; }
+
+        .document-info {
+            flex: 1;
+        }
+
+        .document-name {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .document-meta {
+            font-size: 13px;
+            color: #6b7280;
+        }
+
+        .download-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: #EEF2FF;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #4F46E5;
+            transition: background 0.2s;
+        }
+
+        .download-icon:hover {
+            background: #E0E7FF;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .empty-icon {
+            width: 80px;
+            height: 80px;
+            background: #F3F4F6;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 36px;
+        }
+
+        .empty-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .empty-subtitle {
+            color: #6b7280;
+        }
+
+        /* Error State */
+        .error-container {
+            background: white;
+            border-radius: 20px;
+            padding: 60px 40px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            text-align: center;
+            max-width: 500px;
+            margin: 60px auto;
+        }
+
+        .error-icon {
+            width: 80px;
+            height: 80px;
+            background: #FEE2E2;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+            font-size: 36px;
+        }
+
+        .error-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .error-message {
+            color: #6b7280;
+            margin-bottom: 24px;
+            line-height: 1.6;
+        }
+
+        .home-btn {
+            display: inline-block;
+            background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
+            color: white;
+            padding: 14px 28px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .home-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 40px 20px;
+            color: #9CA3AF;
+            font-size: 14px;
+        }
+
+        .footer a {
+            color: #4F46E5;
+            text-decoration: none;
+        }
+
+        /* Expiry Banner */
+        .expiry-banner {
+            background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%);
+            padding: 12px 20px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 24px;
+            font-size: 14px;
+            color: #92400E;
+        }
+
+        /* Responsive */
+        @media (max-width: 640px) {
+            .header {
+                flex-direction: column;
+                gap: 16px;
+            }
+
+            .folder-meta {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .shared-by {
+                justify-content: center;
+            }
+
+            .access-badge {
+                margin: 12px 0 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <a href="/" class="logo">
+                <div class="logo-icon">Z</div>
+                <span class="logo-text">Zeni</span>
+            </a>
+            <a href="/" class="download-btn">Get the App</a>
+        </header>
+
+        <!-- Main Content (dynamically populated) -->
+        <main id="main-content">
+            <!-- Loading State -->
+            <div class="loading-container" id="loading-state">
+                <div class="spinner"></div>
+                <p class="loading-text">Loading shared folder...</p>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>Shared via <a href="/">Zeni</a> - The Smart Document Workspace</p>
+        </footer>
+    </div>
+
+    <script>
+        // Parse URL parameters
+        function getShareParams() {
+            const params = new URLSearchParams(window.location.search);
+            return {
+                token: params.get('token') || window.location.pathname.split('/').pop(),
+                password: params.get('p')
+            };
+        }
+
+        // Format file size
+        function formatFileSize(bytes) {
+            if (!bytes) return 'Unknown size';
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+        }
+
+        // Format date
+        function formatDate(dateStr) {
+            const date = new Date(dateStr);
+            return date.toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric'
+            });
+        }
+
+        // Get document icon based on type
+        function getDocumentIcon(doc) {
+            const mimeType = doc.mimeType || '';
+            if (mimeType.includes('pdf')) return { icon: '📄', class: 'pdf' };
+            if (mimeType.includes('image')) return { icon: '🖼️', class: 'image' };
+            if (mimeType.includes('word') || mimeType.includes('document')) return { icon: '📝', class: 'doc' };
+            return { icon: '📁', class: 'other' };
+        }
+
+        // Render password form
+        function renderPasswordForm(error = null) {
+            return `
+                <div class="password-container">
+                    <div class="password-icon">🔒</div>
+                    <h2 class="password-title">Password Protected</h2>
+                    <p class="password-subtitle">Enter the password to view this shared folder</p>
+                    <input type="password" class="password-input" id="password-input" placeholder="Enter password" autocomplete="off">
+                    <button class="unlock-btn" onclick="submitPassword()">Unlock Folder</button>
+                    ${error ? `<p class="error-text">${error}</p>` : ''}
+                </div>
+            `;
+        }
+
+        // Render error state
+        function renderError(title, message) {
+            return `
+                <div class="error-container">
+                    <div class="error-icon">😕</div>
+                    <h2 class="error-title">${title}</h2>
+                    <p class="error-message">${message}</p>
+                    <a href="/" class="home-btn">Go to Zeni</a>
+                </div>
+            `;
+        }
+
+        // Render folder content
+        function renderFolderContent(data) {
+            const { folder, documents, sharedBy, accessType, expiresAt } = data;
+            
+            let expiryBanner = '';
+            if (expiresAt) {
+                const expiry = new Date(expiresAt);
+                const now = new Date();
+                const diff = expiry - now;
+                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                
+                if (diff > 0) {
+                    let timeLeft = days > 0 ? `${days} day${days > 1 ? 's' : ''}` : `${hours} hour${hours > 1 ? 's' : ''}`;
+                    expiryBanner = `
+                        <div class="expiry-banner">
+                            ⏰ This link expires in ${timeLeft}
+                        </div>
+                    `;
+                }
+            }
+
+            const documentsHTML = documents.length > 0 
+                ? documents.map(doc => {
+                    const { icon, class: iconClass } = getDocumentIcon(doc);
+                    return `
+                        <div class="document-item" onclick="handleDocumentClick('${doc.id}')">
+                            <div class="document-icon ${iconClass}">${icon}</div>
+                            <div class="document-info">
+                                <div class="document-name">${doc.name}</div>
+                                <div class="document-meta">${formatFileSize(doc.fileSize)} • ${formatDate(doc.createdAt)}</div>
+                            </div>
+                            ${accessType === 'download' ? `
+                                <div class="download-icon">
+                                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                                    </svg>
+                                </div>
+                            ` : ''}
+                        </div>
+                    `;
+                }).join('')
+                : `
+                    <div class="empty-state">
+                        <div class="empty-icon">📂</div>
+                        <h3 class="empty-title">No documents yet</h3>
+                        <p class="empty-subtitle">This folder is empty</p>
+                    </div>
+                `;
+
+            return `
+                ${expiryBanner}
+                <div class="folder-header">
+                    <div class="folder-meta">
+                        <div class="folder-icon">${folder.icon || '📁'}</div>
+                        <div class="folder-info">
+                            <h1>${folder.name}</h1>
+                            <p class="folder-stats">${documents.length} document${documents.length !== 1 ? 's' : ''}</p>
+                        </div>
+                    </div>
+                    <div class="shared-by">
+                        <div class="shared-by-avatar">${(sharedBy?.firstName?.[0] || 'U').toUpperCase()}</div>
+                        <span>Shared by ${sharedBy?.firstName || 'User'} ${sharedBy?.lastName || ''}</span>
+                        <div class="access-badge">
+                            ${accessType === 'download' ? '📥 Can download' : '👁️ View only'}
+                        </div>
+                    </div>
+                </div>
+                <div class="documents-section">
+                    <h2 class="documents-title">📄 Documents</h2>
+                    ${documentsHTML}
+                </div>
+            `;
+        }
+
+        // Handle document click
+        function handleDocumentClick(docId) {
+            // In a real implementation, this would open a document preview or download
+            alert('Document preview coming soon! Download the Zeni app to view documents.');
+        }
+
+        // Submit password
+        async function submitPassword() {
+            const password = document.getElementById('password-input').value;
+            if (!password) {
+                document.getElementById('main-content').innerHTML = renderPasswordForm('Please enter a password');
+                return;
+            }
+            
+            // Reload with password
+            const { token } = getShareParams();
+            window.location.href = `?token=${token}&p=${encodeURIComponent(password)}`;
+        }
+
+        // Main initialization
+        async function init() {
+            const { token, password } = getShareParams();
+            const mainContent = document.getElementById('main-content');
+
+            if (!token) {
+                mainContent.innerHTML = renderError(
+                    'Invalid Share Link',
+                    'This share link appears to be invalid or incomplete. Please check the link and try again.'
+                );
+                return;
+            }
+
+            // Simulate API call - In production, this would fetch from your backend
+            // For demo purposes, we'll show a sample folder
+            setTimeout(() => {
+                // Demo data - replace with actual API call
+                const demoData = {
+                    requiresPassword: false,
+                    folder: {
+                        name: 'Shared Documents',
+                        icon: '📚'
+                    },
+                    documents: [
+                        {
+                            id: '1',
+                            name: 'Project Proposal.pdf',
+                            mimeType: 'application/pdf',
+                            fileSize: 2456789,
+                            createdAt: '2025-12-01'
+                        },
+                        {
+                            id: '2',
+                            name: 'Meeting Notes.docx',
+                            mimeType: 'application/msword',
+                            fileSize: 156234,
+                            createdAt: '2025-12-05'
+                        },
+                        {
+                            id: '3',
+                            name: 'Screenshot.png',
+                            mimeType: 'image/png',
+                            fileSize: 892345,
+                            createdAt: '2025-12-08'
+                        }
+                    ],
+                    sharedBy: {
+                        firstName: 'John',
+                        lastName: 'Doe'
+                    },
+                    accessType: 'download',
+                    expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
+                };
+
+                // Check if password is required
+                if (demoData.requiresPassword && !password) {
+                    mainContent.innerHTML = renderPasswordForm();
+                    return;
+                }
+
+                // Render folder content
+                mainContent.innerHTML = renderFolderContent(demoData);
+
+            }, 1000); // Simulate loading time
+        }
+
+        // Add enter key support for password input
+        document.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && document.getElementById('password-input')) {
+                submitPassword();
+            }
+        });
+
+        // Initialize on page load
+        init();
+    </script>
+</body>
+</html>

@@ -71,6 +71,7 @@ export default function ProfileScreen() {
       title: 'Account Settings',
       subtitle: 'Edit profile, change password',
       screen: 'AccountSettings' as keyof ProfileStackParamList,
+      color: colors.profileIcon,
     },
     {
       id: 'storage',
@@ -78,6 +79,7 @@ export default function ProfileScreen() {
       title: 'Storage & Sync',
       subtitle: 'Manage cloud storage',
       screen: 'Storage' as keyof ProfileStackParamList,
+      color: colors.uploadedIcon,
     },
     {
       id: 'notifications',
@@ -85,6 +87,7 @@ export default function ProfileScreen() {
       title: 'Notifications',
       subtitle: 'Manage notification preferences',
       screen: 'Notifications' as keyof ProfileStackParamList,
+      color: colors.notificationIcon,
     },
     {
       id: 'signatures',
@@ -92,6 +95,7 @@ export default function ProfileScreen() {
       title: 'My Signatures',
       subtitle: 'Manage saved signatures',
       screen: 'Signatures' as keyof ProfileStackParamList,
+      color: colors.editIcon,
     },
     {
       id: 'privacy',
@@ -99,6 +103,7 @@ export default function ProfileScreen() {
       title: 'Privacy & Security',
       subtitle: 'Data protection settings',
       screen: 'PrivacySecurity' as keyof ProfileStackParamList,
+      color: colors.success,
     },
     {
       id: 'help',
@@ -106,6 +111,7 @@ export default function ProfileScreen() {
       title: 'Help & Support',
       subtitle: 'FAQs, contact us',
       screen: 'HelpSupport' as keyof ProfileStackParamList,
+      color: colors.askAiIcon,
     },
     {
       id: 'about',
@@ -113,6 +119,7 @@ export default function ProfileScreen() {
       title: 'About Zeni',
       subtitle: 'Version 1.0.0',
       screen: 'About' as keyof ProfileStackParamList,
+      color: colors.settingsIcon,
     },
   ];
 
@@ -135,20 +142,72 @@ export default function ProfileScreen() {
             </TouchableOpacity>
           </View>
           <View style={styles.profileInfo}>
-            <Text style={[styles.profileName, { color: colors.textPrimary }]}>
-              {user?.firstName || 'Student'}
-            </Text>
+            <View style={styles.nameRow}>
+              <Text style={[styles.profileName, { color: colors.textPrimary }]}>
+                {user?.firstName || 'User'}
+              </Text>
+              {user?.verification?.status === 'verified' && (
+                <View style={[styles.verifiedBadge, { backgroundColor: colors.success + '20' }]}>
+                  <Ionicons name="shield-checkmark" size={12} color={colors.success} />
+                </View>
+              )}
+            </View>
             <Text style={[styles.profileEmail, { color: colors.textSecondary }]}>
-              {user?.email || 'student@example.com'}
+              {user?.email || 'user@example.com'}
             </Text>
             {user?.school && (
-              <View style={styles.schoolBadge}>
+              <View style={[styles.schoolBadge, { backgroundColor: colors.primaryLight }]}>
                 <Ionicons name="school" size={12} color={colors.primary} />
                 <Text style={[styles.schoolText, { color: colors.primary }]}>{user.school}</Text>
               </View>
             )}
           </View>
         </View>
+
+        {/* Student Verification Banner */}
+        {user?.verification?.status === 'pending' ? (
+          <TouchableOpacity 
+            style={[styles.verificationBanner, { backgroundColor: colors.warning + '15', borderColor: colors.warning + '40' }]}
+            onPress={() => navigation.navigate('StudentVerification')}
+            activeOpacity={0.8}
+          >
+            <View style={[styles.verificationIcon, { backgroundColor: colors.warning }]}>
+              <Ionicons name="mail-unread" size={20} color="#FFFFFF" />
+            </View>
+            <View style={styles.verificationContent}>
+              <Text style={[styles.verificationTitle, { color: colors.textPrimary }]}>
+                Verify your email
+              </Text>
+              <Text style={[styles.verificationSubtitle, { color: colors.textSecondary }]} numberOfLines={1}>
+                Check {user?.verification?.verifiedEmail} to unlock premium
+              </Text>
+            </View>
+            <View style={[styles.verificationArrow, { backgroundColor: colors.warning }]}>
+              <Ionicons name="arrow-forward" size={16} color="#FFFFFF" />
+            </View>
+          </TouchableOpacity>
+        ) : user?.verification?.status !== 'verified' && (
+          <TouchableOpacity 
+            style={[styles.verificationBanner, { backgroundColor: colors.primaryLight, borderColor: colors.primary + '30' }]}
+            onPress={() => navigation.navigate('StudentVerification')}
+            activeOpacity={0.8}
+          >
+            <View style={[styles.verificationIcon, { backgroundColor: colors.primary }]}>
+              <Ionicons name="school" size={20} color={colors.textInverse} />
+            </View>
+            <View style={styles.verificationContent}>
+              <Text style={[styles.verificationTitle, { color: colors.textPrimary }]}>
+                Are you a student?
+              </Text>
+              <Text style={[styles.verificationSubtitle, { color: colors.textSecondary }]}>
+                Verify with .edu email for free premium
+              </Text>
+            </View>
+            <View style={[styles.verificationArrow, { backgroundColor: colors.primary }]}>
+              <Ionicons name="arrow-forward" size={16} color={colors.textInverse} />
+            </View>
+          </TouchableOpacity>
+        )}
 
         {/* Stats */}
         <View style={[styles.statsRow, { backgroundColor: colors.surface }]}>
@@ -233,7 +292,7 @@ export default function ProfileScreen() {
                 <Ionicons
                   name={item.icon as any}
                   size={22}
-                  color={colors.primary}
+                  color={item.color}
                 />
               </View>
               <View style={styles.menuContent}>
@@ -316,10 +375,22 @@ const styles = StyleSheet.create({
     flex: 1,
     marginLeft: spacing.lg,
   },
+  nameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    marginBottom: spacing.xs,
+  },
   profileName: {
     fontSize: typography.fontSize.xl,
     fontWeight: '700',
-    marginBottom: spacing.xs,
+  },
+  verifiedBadge: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   profileEmail: {
     fontSize: typography.fontSize.sm,
@@ -337,6 +408,41 @@ const styles = StyleSheet.create({
   schoolText: {
     fontSize: typography.fontSize.xs,
     fontWeight: '500',
+  },
+  verificationBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginHorizontal: spacing.xxl,
+    marginTop: spacing.lg,
+    padding: spacing.md,
+    borderRadius: borderRadius.lg,
+    borderWidth: 1,
+  },
+  verificationIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  verificationContent: {
+    flex: 1,
+    marginLeft: spacing.md,
+  },
+  verificationTitle: {
+    fontSize: typography.fontSize.md,
+    fontWeight: '600',
+    marginBottom: 2,
+  },
+  verificationSubtitle: {
+    fontSize: typography.fontSize.sm,
+  },
+  verificationArrow: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   statsRow: {
     flexDirection: 'row',

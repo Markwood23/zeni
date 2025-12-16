@@ -70,12 +70,27 @@ export default function FaxScreen() {
     }
   };
 
-  const renderInstitution = ({ item }: { item: Institution }) => (
+  const getCategoryColor = (category: string) => {
+    switch (category) {
+      case 'university':
+        return colors.primary; // Blue for education
+      case 'embassy':
+        return '#06b6d4'; // Cyan for international
+      case 'government':
+        return '#64748b'; // Slate for government
+      default:
+        return colors.faxedIcon;
+    }
+  };
+
+  const renderInstitution = ({ item }: { item: Institution }) => {
+    const categoryColor = getCategoryColor(item.category);
+    return (
     <TouchableOpacity
       style={styles.institutionCard}
       onPress={() => handleSelectInstitution(item)}
     >
-      <View style={styles.institutionIcon}>
+      <View style={[styles.institutionIcon, { backgroundColor: categoryColor + '15' }]}>
         <Ionicons
           name={
             item.category === 'university'
@@ -85,7 +100,7 @@ export default function FaxScreen() {
               : 'business-outline'
           }
           size={24}
-          color={colors.primary}
+          color={categoryColor}
         />
       </View>
       <View style={styles.institutionInfo}>
@@ -96,13 +111,14 @@ export default function FaxScreen() {
       <Ionicons name="chevron-forward" size={20} color={colors.textTertiary} />
     </TouchableOpacity>
   );
+  };
 
   const renderFaxHistory = ({ item }: { item: FaxJob }) => {
     const doc = documents.find((d) => d.id === item.documentId);
     return (
       <TouchableOpacity style={styles.faxHistoryCard}>
-        <View style={styles.faxHistoryIcon}>
-          <Ionicons name="document-text-outline" size={20} color={colors.textSecondary} />
+        <View style={[styles.faxHistoryIcon, { backgroundColor: colors.faxedIcon + '15' }]}>
+          <Ionicons name="document-text-outline" size={20} color={colors.faxedIcon} />
         </View>
         <View style={styles.faxHistoryInfo}>
           <Text style={styles.faxHistoryName} numberOfLines={1}>
@@ -142,8 +158,8 @@ export default function FaxScreen() {
           <>
             {/* Hero */}
             <View style={styles.heroSection}>
-              <View style={styles.heroIcon}>
-                <Ionicons name="print" size={32} color={colors.primary} />
+              <View style={[styles.heroIcon, { backgroundColor: colors.faxedIcon + '15' }]}>
+                <Ionicons name="print" size={32} color={colors.faxedIcon} />
               </View>
               <Text style={styles.heroTitle}>Send Documents via Fax</Text>
               <Text style={styles.heroSubtitle}>
@@ -192,7 +208,7 @@ export default function FaxScreen() {
 
             {/* Manual Entry */}
             <TouchableOpacity style={styles.manualEntry} onPress={handleManualEntry}>
-              <Ionicons name="keypad-outline" size={24} color={colors.primary} />
+              <Ionicons name="keypad-outline" size={24} color={colors.accent} />
               <View style={styles.manualEntryInfo}>
                 <Text style={styles.manualEntryTitle}>Enter Fax Number Manually</Text>
                 <Text style={styles.manualEntrySubtitle}>

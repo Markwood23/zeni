@@ -5,8 +5,8 @@ const themeToggle = document.getElementById('themeToggle');
 const themeToggleMobile = document.getElementById('themeToggleMobile');
 const html = document.documentElement;
 
-// Get saved theme or default to dark
-const savedTheme = localStorage.getItem('theme') || 'dark';
+// Get saved theme or default to light (modern preference)
+const savedTheme = localStorage.getItem('theme') || 'light';
 html.setAttribute('data-theme', savedTheme);
 
 function toggleTheme() {
@@ -129,3 +129,182 @@ document.head.appendChild(style);
 console.log('%c🚀 Zeni', 'font-size: 24px; font-weight: bold; color: #017DE9;');
 console.log('%cSmart Document Workspace for Students', 'font-size: 14px; color: #6B7280;');
 console.log('%cInterested in joining our team? Email us at careers@zenigh.online', 'font-size: 12px; color: #9CA3AF;');
+
+// ========================================
+// Convert Format Animation
+// ========================================
+const formatConversions = [
+    { from: 'PDF', fromClass: 'format-pdf', to: 'IMG', toClass: 'format-img' },
+    { from: 'Word', fromClass: 'format-word', to: 'PDF', toClass: 'format-pdf' },
+    { from: 'JPG', fromClass: 'format-jpg', to: 'PNG', toClass: 'format-png' },
+    { from: 'Excel', fromClass: 'format-excel', to: 'PDF', toClass: 'format-pdf' },
+    { from: 'PNG', fromClass: 'format-png', to: 'JPG', toClass: 'format-jpg' },
+    { from: 'PDF', fromClass: 'format-pdf', to: 'Word', toClass: 'format-word' }
+];
+
+let currentFormatIndex = 0;
+
+function cycleFormats() {
+    const fromBadge = document.querySelector('.format-from');
+    const toBadge = document.querySelector('.format-to');
+    
+    if (!fromBadge || !toBadge) return;
+    
+    // Fade out
+    fromBadge.style.opacity = '0';
+    toBadge.style.opacity = '0';
+    fromBadge.style.transform = 'scale(0.8)';
+    toBadge.style.transform = 'scale(0.8)';
+    
+    setTimeout(() => {
+        currentFormatIndex = (currentFormatIndex + 1) % formatConversions.length;
+        const conversion = formatConversions[currentFormatIndex];
+        
+        // Update text
+        fromBadge.textContent = conversion.from;
+        toBadge.textContent = conversion.to;
+        
+        // Update colors - remove old classes and add new ones
+        fromBadge.className = 'file-badge format-from ' + conversion.fromClass;
+        toBadge.className = 'file-badge alt format-to ' + conversion.toClass;
+        
+        // Fade in
+        fromBadge.style.opacity = '1';
+        toBadge.style.opacity = '1';
+        fromBadge.style.transform = 'scale(1)';
+        toBadge.style.transform = 'scale(1)';
+    }, 400);
+}
+
+// Add transition styles to format badges
+const formatBadges = document.querySelectorAll('.format-from, .format-to');
+formatBadges.forEach(badge => {
+    badge.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+});
+
+// Initialize first format colors
+const initFromBadge = document.querySelector('.format-from');
+const initToBadge = document.querySelector('.format-to');
+if (initFromBadge && initToBadge) {
+    initFromBadge.classList.add('format-pdf');
+    initToBadge.classList.add('format-img');
+}
+
+// Cycle formats every 4 seconds
+setInterval(cycleFormats, 4000);
+
+// ========================================
+// Fax Status Animation
+// ========================================
+const faxStatuses = [
+    { text: 'Sending...', color: '#eab308' },
+    { text: 'Processing', color: '#017DE9' },
+    { text: 'Delivered', color: '#22c55e' }
+];
+
+let currentFaxStatus = 0;
+
+function cycleFaxStatus() {
+    const statusText = document.querySelector('.fax-status-text');
+    const statusDot = document.querySelector('.status-dot');
+    
+    if (!statusText || !statusDot) return;
+    
+    currentFaxStatus = (currentFaxStatus + 1) % faxStatuses.length;
+    const status = faxStatuses[currentFaxStatus];
+    
+    // Animate out
+    statusText.style.opacity = '0';
+    
+    setTimeout(() => {
+        statusText.textContent = status.text;
+        statusDot.style.background = status.color;
+        statusText.style.color = status.color;
+        statusText.style.opacity = '1';
+    }, 200);
+}
+
+// Add transition to status text
+const statusTextEl = document.querySelector('.fax-status-text');
+if (statusTextEl) {
+    statusTextEl.style.transition = 'opacity 0.2s ease, color 0.3s ease';
+}
+
+// Add transition to status dot
+const statusDotEl = document.querySelector('.status-dot');
+if (statusDotEl) {
+    statusDotEl.style.transition = 'background 0.3s ease';
+}
+
+// Cycle fax status every 5 seconds
+setInterval(cycleFaxStatus, 5000);
+
+// ========================================
+// Stats Counter Animation
+// ========================================
+function animateCounter(element, target, isDecimal = false) {
+    const duration = 2000;
+    const start = 0;
+    const increment = target / (duration / 16);
+    let current = start;
+    
+    const timer = setInterval(() => {
+        current += increment;
+        if (current >= target) {
+            current = target;
+            clearInterval(timer);
+        }
+        
+        if (isDecimal) {
+            element.textContent = current.toFixed(1);
+        } else if (target >= 1000000) {
+            element.textContent = (current / 1000000).toFixed(1) + 'M';
+        } else if (target >= 1000) {
+            element.textContent = Math.floor(current / 1000) + 'K';
+        } else {
+            element.textContent = Math.floor(current);
+        }
+    }, 16);
+}
+
+// Observe stats section for animation trigger
+const statsSection = document.querySelector('.stats-section');
+if (statsSection) {
+    const statsObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                document.querySelectorAll('.stat-number').forEach(stat => {
+                    const target = parseFloat(stat.dataset.target);
+                    const isDecimal = stat.dataset.decimal === 'true';
+                    animateCounter(stat, target, isDecimal);
+                });
+                statsObserver.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.3 });
+    
+    statsObserver.observe(statsSection);
+}
+
+// ========================================
+// FAQ Accordion
+// ========================================
+const faqItems = document.querySelectorAll('.faq-item');
+
+faqItems.forEach(item => {
+    const question = item.querySelector('.faq-question');
+    
+    question?.addEventListener('click', () => {
+        const isActive = item.classList.contains('active');
+        
+        // Close all other items
+        faqItems.forEach(otherItem => {
+            otherItem.classList.remove('active');
+        });
+        
+        // Toggle current item
+        if (!isActive) {
+            item.classList.add('active');
+        }
+    });
+});

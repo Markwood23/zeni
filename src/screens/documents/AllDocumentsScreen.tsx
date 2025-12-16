@@ -218,6 +218,10 @@ export default function AllDocumentsScreen() {
         return 'create';
       case 'faxed':
         return 'print';
+      case 'imported':
+        return 'download';
+      case 'converted':
+        return 'swap-horizontal';
       default:
         return 'document-text';
     }
@@ -226,13 +230,19 @@ export default function AllDocumentsScreen() {
   const getTypeColor = (type: string) => {
     switch (type) {
       case 'scanned':
-        return colors?.scanIcon || colors?.primary || '#017DE9';
+        return colors?.scanIcon || colors?.primary;
+      case 'uploaded':
+        return colors?.uploadedIcon || colors?.primary;
       case 'edited':
-        return colors?.editIcon || colors?.primary || '#017DE9';
+        return colors?.editIcon || colors?.primary;
       case 'faxed':
-        return colors?.convertIcon || colors?.primary || '#017DE9';
+        return colors?.faxedIcon || colors?.primary;
+      case 'imported':
+        return colors?.importedIcon || colors?.primary;
+      case 'converted':
+        return colors?.convertIcon || colors?.primary;
       default:
-        return colors?.primary || '#017DE9';
+        return colors?.primary;
     }
   };
 

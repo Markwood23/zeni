@@ -1,113 +1,146 @@
-// Zeni App Theme - Minimalist Grayscale Design with Accent Colors
+// Zeni App Theme - Modern Design with Blue Primary Color
+
+// Primary brand color
+export const brandColors = {
+  primary: '#017DE9',      // Zeni Blue - primary brand color
+  primaryLight: 'rgba(1, 125, 233, 0.1)',
+  primaryDark: '#0165BB',
+};
 
 // Accent colors for interactive elements
 export const accentColors = {
-  primary: '#000000',      // Black - primary actions
+  primary: '#017DE9',      // Zeni Blue - primary actions
   accent: '#FF5722',       // Deep orange - highlight/accent
   accentLight: '#FFF3E0',  // Light orange tint
-  success: '#4CAF50',      // Green for success states
-  error: '#F44336',        // Red for errors
-  warning: '#FF9800',      // Orange for warnings
+  success: '#22c55e',      // Green for success states
+  error: '#ef4444',        // Red for errors
+  warning: '#f59e0b',      // Orange for warnings
 };
 
-// Light theme colors - Grayscale with accents
+// Light theme colors
 export const lightColors = {
-  // Primary colors (Blue for interactive elements)
+  // Primary colors (Zeni Blue)
   primary: '#017DE9',
   primaryLight: 'rgba(1, 125, 233, 0.08)',
   primaryDark: '#0165BB',
   
   // Accent color for highlights
-  accent: '#FF5722',
-  accentLight: '#FFF3E0',
+  accent: '#8b5cf6',
+  accentLight: 'rgba(139, 92, 246, 0.1)',
   
-  // Neutral grayscale
+  // Neutral backgrounds
   background: '#FFFFFF',
   surface: '#FFFFFF',
-  surfaceSecondary: 'rgba(0, 0, 0, 0.015)',
-  iconBackground: 'rgba(0, 0, 0, 0.02)',
+  surfaceSecondary: '#F8FAFC',
+  iconBackground: '#F1F5F9',
   
-  // Text colors - grayscale hierarchy
-  textPrimary: '#000000',
-  textSecondary: '#555555',
-  textTertiary: '#888888',
+  // Text colors - hierarchy
+  textPrimary: '#0f172a',
+  textSecondary: '#475569',
+  textTertiary: '#94a3b8',
   textInverse: '#FFFFFF',
   
-  // Status colors (only these have color)
-  success: '#4CAF50',
-  error: '#F44336',
-  warning: '#FF9800',
-  info: '#000000',
+  // Status colors
+  success: '#22c55e',
+  error: '#ef4444',
+  warning: '#f59e0b',
+  info: '#017DE9',
   
-  // Border and dividers - subtle grays
-  border: '#E0E0E0',
-  borderLight: '#F0F0F0',
-  divider: '#EEEEEE',
+  // Border and dividers
+  border: '#e2e8f0',
+  borderLight: '#f1f5f9',
+  divider: '#e2e8f0',
   
   // Shadows
   shadow: 'rgba(0, 0, 0, 0.08)',
   shadowDark: 'rgba(0, 0, 0, 0.15)',
   
-  // Icon colors - grayscale
-  scanIcon: '#000000',
-  editIcon: '#333333',
-  convertIcon: '#333333',
-  askAiIcon: '#333333',
+  // Feature icon colors
+  scanIcon: '#017DE9',
+  editIcon: '#22c55e',
+  convertIcon: '#8b5cf6',
+  askAiIcon: '#f59e0b',
   
-  // Keep blue for backward compatibility but won't use
-  blue: '#000000',
-  blueLight: 'rgba(0, 0, 0, 0.02)',
-  blueDark: '#000000',
+  // Document type icon colors
+  uploadedIcon: '#06b6d4',    // Cyan for uploaded
+  faxedIcon: '#ec4899',       // Pink for faxed
+  importedIcon: '#14b8a6',    // Teal for imported
+  
+  // Action icon colors
+  shareIcon: '#3b82f6',       // Blue for share
+  deleteIcon: '#ef4444',      // Red for delete
+  folderIcon: '#f59e0b',      // Amber for folders
+  notificationIcon: '#8b5cf6', // Purple for notifications
+  settingsIcon: '#64748b',    // Slate for settings
+  profileIcon: '#06b6d4',     // Cyan for profile
+  
+  // Legacy support
+  blue: '#017DE9',
+  blueLight: 'rgba(1, 125, 233, 0.08)',
+  blueDark: '#0165BB',
 };
 
-// Dark theme colors - Grayscale with accents
+// Dark theme colors
 export const darkColors = {
-  // Primary colors (Blue for interactive elements)
-  primary: '#2E9BFF',
-  primaryLight: 'rgba(46, 155, 255, 0.15)',
+  // Primary colors (Zeni Blue for dark mode)
+  primary: '#3b9eff',
+  primaryLight: 'rgba(59, 158, 255, 0.12)',
   primaryDark: '#017DE9',
   
   // Accent color for highlights
-  accent: '#FF7043',
-  accentLight: '#3D2A24',
+  accent: '#a78bfa',
+  accentLight: 'rgba(167, 139, 250, 0.15)',
   
-  // Neutral grayscale
-  background: '#0A0A0A',
-  surface: '#141414',
-  surfaceSecondary: 'rgba(255, 255, 255, 0.025)',
-  iconBackground: 'rgba(255, 255, 255, 0.03)',
+  // True dark backgrounds (comfortable dark, not pure black)
+  background: '#121212',
+  surface: '#1e1e1e',
+  surfaceSecondary: '#2a2a2a',
+  iconBackground: '#2a2a2a',
   
-  // Text colors - grayscale hierarchy
-  textPrimary: '#FFFFFF',
-  textSecondary: '#AAAAAA',
-  textTertiary: '#666666',
+  // Text colors - hierarchy
+  textPrimary: '#ffffff',
+  textSecondary: '#ebebf5',
+  textTertiary: '#8e8e93',
   textInverse: '#000000',
   
   // Status colors
-  success: '#66BB6A',
-  error: '#EF5350',
-  warning: '#FFA726',
-  info: '#FFFFFF',
+  success: '#4ade80',
+  error: '#f87171',
+  warning: '#fbbf24',
+  info: '#3b9eff',
   
   // Border and dividers
-  border: '#333333',
-  borderLight: '#222222',
-  divider: '#2A2A2A',
+  border: '#38383a',
+  borderLight: '#2c2c2e',
+  divider: '#38383a',
   
   // Shadows
   shadow: 'rgba(0, 0, 0, 0.4)',
   shadowDark: 'rgba(0, 0, 0, 0.6)',
   
-  // Icon colors
-  scanIcon: '#FFFFFF',
-  editIcon: '#CCCCCC',
-  convertIcon: '#CCCCCC',
-  askAiIcon: '#CCCCCC',
+  // Feature icon colors
+  scanIcon: '#3b9eff',
+  editIcon: '#4ade80',
+  convertIcon: '#a78bfa',
+  askAiIcon: '#fbbf24',
   
-  // Keep for backward compatibility
-  blue: '#FFFFFF',
-  blueLight: 'rgba(255, 255, 255, 0.02)',
-  blueDark: '#FFFFFF',
+  // Document type icon colors
+  uploadedIcon: '#22d3ee',    // Cyan for uploaded
+  faxedIcon: '#f472b6',       // Pink for faxed
+  importedIcon: '#2dd4bf',    // Teal for imported
+  
+  // Action icon colors
+  shareIcon: '#60a5fa',       // Blue for share
+  deleteIcon: '#f87171',      // Red for delete
+  folderIcon: '#fbbf24',      // Amber for folders
+  notificationIcon: '#a78bfa', // Purple for notifications
+  settingsIcon: '#94a3b8',    // Slate for settings
+  profileIcon: '#22d3ee',     // Cyan for profile
+  
+  // Legacy support
+  blue: '#3b9eff',
+  blueLight: 'rgba(59, 158, 255, 0.15)',
+  blueDark: '#017DE9',
 };
 
 // Default to light colors for backward compatibility

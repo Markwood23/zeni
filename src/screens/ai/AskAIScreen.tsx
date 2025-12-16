@@ -5,6 +5,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   FlatList,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
@@ -54,13 +55,73 @@ const quickPrompts: QuickPrompt[] = [
     prompt: 'Are there any deadlines or important dates mentioned?',
     icon: 'calendar-outline',
   },
+  {
+    id: '7',
+    label: 'Delete old documents',
+    prompt: 'Can you help me delete documents I no longer need?',
+    icon: 'trash-outline',
+  },
+  {
+    id: '8',
+    label: 'Organize my files',
+    prompt: 'Help me organize my documents into folders',
+    icon: 'folder-outline',
+  },
+  {
+    id: '9',
+    label: 'Create & save study guide',
+    prompt: 'Create a study guide from one of my documents and save it to a folder',
+    icon: 'school-outline',
+  },
+  {
+    id: '10',
+    label: 'Send via email',
+    prompt: 'Help me send a document via email',
+    icon: 'send-outline',
+  },
+  {
+    id: '11',
+    label: 'Translate content',
+    prompt: 'Can you translate this document?',
+    icon: 'language-outline',
+  },
+  {
+    id: '12',
+    label: 'Find action items',
+    prompt: 'What action items or tasks are mentioned in this document?',
+    icon: 'checkbox-outline',
+  },
+  {
+    id: '13',
+    label: 'Compare documents',
+    prompt: 'Can you compare two of my documents?',
+    icon: 'git-compare-outline',
+  },
+  {
+    id: '14',
+    label: 'Create to-do list',
+    prompt: 'Create a to-do list from my documents',
+    icon: 'checkmark-circle-outline',
+  },
+  {
+    id: '15',
+    label: 'What\'s new?',
+    prompt: 'What have I been working on recently?',
+    icon: 'time-outline',
+  },
+  {
+    id: '16',
+    label: 'Check my storage',
+    prompt: 'How much storage am I using?',
+    icon: 'cloud-outline',
+  },
 ];
 
 export default function AskAIScreen() {
   const navigation = useNavigation<NavigationProp>();
   const { colors } = useTheme();
   const styles = createStyles(colors);
-  const { conversations, addConversation } = useAIStore();
+  const { conversations, addConversation, deleteConversation } = useAIStore();
 
   const handleNewChat = (initialPrompt?: string) => {
     const newConversation: AIConversation = {
@@ -92,6 +153,42 @@ export default function AskAIScreen() {
     return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
   };
 
+  const handleDeleteConversation = (conversationId: string, title: string) => {
+    Alert.alert(
+      'Delete Conversation',
+      `Are you sure you want to delete "${title}"?`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: () => {
+            deleteConversation(conversationId);
+          },
+        },
+      ]
+    );
+  };
+
+  const handleConversationLongPress = (item: AIConversation) => {
+    Alert.alert(
+      item.title,
+      'What would you like to do?',
+      [
+        { 
+          text: 'Open', 
+          onPress: () => handleSelectConversation(item.id) 
+        },
+        { 
+          text: 'Delete', 
+          style: 'destructive',
+          onPress: () => handleDeleteConversation(item.id, item.title) 
+        },
+        { text: 'Cancel', style: 'cancel' },
+      ]
+    );
+  };
+
   const renderQuickPrompt = ({ item }: { item: QuickPrompt }) => (
     <TouchableOpacity
       style={styles.promptChip}
@@ -106,6 +203,7 @@ export default function AskAIScreen() {
     <TouchableOpacity
       style={styles.conversationCard}
       onPress={() => handleSelectConversation(item.id)}
+      onLongPress={() => handleConversationLongPress(item)}
     >
       <View style={styles.conversationIcon}>
         <Ionicons name="chatbubble-outline" size={20} color={colors.textSecondary} />
@@ -118,7 +216,12 @@ export default function AskAIScreen() {
           {item.messages.length} messages • {formatDate(item.updatedAt)}
         </Text>
       </View>
-      <Ionicons name="chevron-forward" size={20} color={colors.textTertiary} />
+      <TouchableOpacity 
+        style={styles.deleteConversationButton}
+        onPress={() => handleDeleteConversation(item.id, item.title)}
+      >
+        <Ionicons name="trash-outline" size={18} color={colors.error} />
+      </TouchableOpacity>
     </TouchableOpacity>
   );
 
@@ -132,7 +235,7 @@ export default function AskAIScreen() {
         >
           <Ionicons name="arrow-back" size={24} color={colors.textPrimary} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Ask AI</Text>
+        <Text style={styles.headerTitle}>Zai</Text>
         <TouchableOpacity style={styles.newChatButton} onPress={() => handleNewChat()}>
           <Ionicons name="add" size={24} color={colors.primary} />
         </TouchableOpacity>
@@ -150,9 +253,9 @@ export default function AskAIScreen() {
               <View style={styles.heroIcon}>
                 <Ionicons name="sparkles" size={40} color={colors.askAiIcon} />
               </View>
-              <Text style={styles.heroTitle}>Your AI Study Assistant</Text>
+              <Text style={styles.heroTitle}>Meet Zai ✨</Text>
               <Text style={styles.heroSubtitle}>
-                Ask questions, get summaries, and get help with your documents
+                Your powerful AI assistant with full control - read documents, delete files, send emails, organize folders, and more!
               </Text>
             </View>
 
@@ -162,7 +265,7 @@ export default function AskAIScreen() {
               onPress={() => handleNewChat()}
             >
               <Ionicons name="chatbubbles-outline" size={24} color={colors.textInverse} />
-              <Text style={styles.newChatText}>Start New Conversation</Text>
+              <Text style={styles.newChatText}>Chat with Zai</Text>
             </TouchableOpacity>
 
             {/* Quick Prompts */}
@@ -182,7 +285,7 @@ export default function AskAIScreen() {
             <View style={styles.disclaimer}>
               <Ionicons name="information-circle-outline" size={16} color={colors.textTertiary} />
               <Text style={styles.disclaimerText}>
-                AI is a learning tool, not a substitute for studying. Always verify important information.
+                Zai is here to help, but always verify important information. AI responses may not always be 100% accurate.
               </Text>
             </View>
 
@@ -197,9 +300,9 @@ export default function AskAIScreen() {
         ListEmptyComponent={
           <View style={styles.emptyState}>
             <Ionicons name="chatbubbles-outline" size={48} color={colors.textTertiary} />
-            <Text style={styles.emptyText}>No conversations yet</Text>
+            <Text style={styles.emptyText}>No chats yet</Text>
             <Text style={styles.emptySubtext}>
-              Start a new conversation to ask AI for help
+              Start chatting with Zai to get help with anything
             </Text>
           </View>
         }
@@ -371,6 +474,13 @@ const createStyles = (colors: any) => StyleSheet.create({
   conversationMeta: {
     fontSize: typography.fontSize.sm,
     color: colors.textTertiary,
+  },
+  deleteConversationButton: {
+    width: 36,
+    height: 36,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginLeft: spacing.sm,
   },
   emptyState: {
     alignItems: 'center',

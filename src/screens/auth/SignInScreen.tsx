@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   View,
   Text,
@@ -8,15 +8,22 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  Animated,
+  ActivityIndicator,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Ionicons } from '@expo/vector-icons';
-import { spacing, borderRadius, typography } from '../../constants/theme';
+import * as WebBrowser from 'expo-web-browser';
+import * as Google from 'expo-auth-session/providers/google';
+import { spacing, borderRadius, typography, shadows } from '../../constants/theme';
 import { useTheme } from '../../context/ThemeContext';
 import { AuthStackParamList } from '../../types';
 import { useUserStore, generateId } from '../../store';
+
+WebBrowser.maybeCompleteAuthSession();
 
 type NavigationProp = NativeStackNavigationProp<AuthStackParamList, 'SignIn'>;
 
@@ -29,20 +36,167 @@ export default function SignInScreen() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [focusedInput, setFocusedInput] = useState<string | null>(null);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const [isAppleLoading, setIsAppleLoading] = useState(false);
+
+  // Google Auth configuration
+  const [request, response, promptAsync] = Google.useAuthRequest({
+    clientId: 'YOUR_WEB_CLIENT_ID.apps.googleusercontent.com',
+  });
+
+  // Animations
+  const headerOpacity = useRef(new Animated.Value(0)).current;
+  const headerTranslate = useRef(new Animated.Value(-20)).current;
+  const formOpacity = useRef(new Animated.Value(0)).current;
+  const formTranslate = useRef(new Animated.Value(30)).current;
+
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(headerOpacity, {
+        toValue: 1,
+        duration: 400,
+        useNativeDriver: true,
+      }),
+      Animated.timing(headerTranslate, {
+        toValue: 0,
+        duration: 400,
+        useNativeDriver: true,
+      }),
+    ]).start();
+
+    setTimeout(() => {
+      Animated.parallel([
+        Animated.timing(formOpacity, {
+          toValue: 1,
+          duration: 400,
+          useNativeDriver: true,
+        }),
+        Animated.timing(formTranslate, {
+          toValue: 0,
+          duration: 400,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    }, 200);
+  }, []);
+
+  // Handle Google Auth response
+  useEffect(() => {
+    if (response?.type === 'success') {
+      const { authentication } = response;
+      if (authentication?.accessToken) {
+        handleGoogleSignIn(authentication.accessToken);
+      }
+    } else if (response?.type === 'error') {
+      setIsGoogleLoading(false);
+      Alert.alert('Sign In Error', 'Google sign in was cancelled or failed.');
+    }
+  }, [response]);
+
+  const handleGoogleSignIn = async (accessToken: string) => {
+    try {
+      const userInfoResponse = await fetch('https://www.googleapis.com/userinfo/v2/me', {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+      const userInfo = await userInfoResponse.json();
+      
+      setUser({
+        id: generateId(),
+        firstName: userInfo.given_name || 'User',
+        email: userInfo.email,
+        avatar: userInfo.picture,
+        accountType: 'standard',
+        authProvider: 'google',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+    } catch (error) {
+      Alert.alert('Error', 'Failed to get user information from Google.');
+    } finally {
+      setIsGoogleLoading(false);
+    }
+  };
+
+  const handleGooglePress = () => {
+    setIsGoogleLoading(true);
+    if (!request) {
+      Alert.alert(
+        'Google Sign In',
+        'Google Sign In requires OAuth setup. Continue with demo account?',
+        [
+          { text: 'Cancel', style: 'cancel', onPress: () => setIsGoogleLoading(false) },
+          {
+            text: 'Continue Demo',
+            onPress: () => {
+              setUser({
+                id: generateId(),
+                firstName: 'Google User',
+                email: 'user@gmail.com',
+                accountType: 'standard',
+                authProvider: 'google',
+                createdAt: new Date(),
+                updatedAt: new Date(),
+              });
+              setIsGoogleLoading(false);
+            },
+          },
+        ]
+      );
+    } else {
+      promptAsync();
+    }
+  };
+
+  const handleAppleSignIn = () => {
+    setIsAppleLoading(true);
+    Alert.alert(
+      'Apple Sign In',
+      'Apple Sign In requires developer setup. Continue with demo account?',
+      [
+        { text: 'Cancel', style: 'cancel', onPress: () => setIsAppleLoading(false) },
+        {
+          text: 'Continue Demo',
+          onPress: () => {
+            setUser({
+              id: generateId(),
+              firstName: 'Apple User',
+              email: 'user@privaterelay.appleid.com',
+              accountType: 'standard',
+              authProvider: 'apple',
+              createdAt: new Date(),
+              updatedAt: new Date(),
+            });
+            setIsAppleLoading(false);
+          },
+        },
+      ]
+    );
+  };
 
   const handleSignIn = async () => {
     setIsLoading(true);
+    
+    // Check if email is a .edu email for auto student detection
+    const isEduEmail = email.toLowerCase().endsWith('.edu');
+    
     // Simulate API call
     setTimeout(() => {
       setUser({
         id: generateId(),
-        firstName: 'Student',
+        firstName: 'User',
         email: email,
+        accountType: isEduEmail ? 'student' : 'standard',
+        verification: isEduEmail ? {
+          status: 'pending',
+          method: 'edu_email',
+          verifiedEmail: email,
+        } : undefined,
         createdAt: new Date(),
         updatedAt: new Date(),
       });
       setIsLoading(false);
-    }, 1000);
+    }, 1500);
   };
 
   return (
@@ -54,25 +208,55 @@ export default function SignInScreen() {
         <ScrollView
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
         >
           {/* Header */}
-          <View style={styles.header}>
+          <Animated.View 
+            style={[
+              styles.header,
+              {
+                opacity: headerOpacity,
+                transform: [{ translateY: headerTranslate }],
+              }
+            ]}
+          >
             <TouchableOpacity
               style={styles.backButton}
               onPress={() => navigation.goBack()}
+              activeOpacity={0.7}
             >
               <Ionicons name="arrow-back" size={24} color={colors.textPrimary} />
             </TouchableOpacity>
+            
+            <View style={styles.logoMini}>
+              <Text style={styles.logoMiniZ}>Z</Text>
+            </View>
+            
             <Text style={styles.title}>Welcome back</Text>
-            <Text style={styles.subtitle}>Sign in to continue</Text>
-          </View>
+            <Text style={styles.subtitle}>Sign in to your account to continue</Text>
+          </Animated.View>
 
           {/* Form */}
-          <View style={styles.form}>
+          <Animated.View 
+            style={[
+              styles.form,
+              {
+                opacity: formOpacity,
+                transform: [{ translateY: formTranslate }],
+              }
+            ]}
+          >
             <View style={styles.inputGroup}>
               <Text style={styles.label}>Email or Phone</Text>
-              <View style={styles.inputContainer}>
-                <Ionicons name="mail-outline" size={20} color={colors.textTertiary} />
+              <View style={[
+                styles.inputContainer,
+                focusedInput === 'email' && styles.inputFocused
+              ]}>
+                <Ionicons 
+                  name="mail-outline" 
+                  size={20} 
+                  color={focusedInput === 'email' ? colors.primary : colors.textTertiary} 
+                />
                 <TextInput
                   style={styles.input}
                   placeholder="Enter your email or phone"
@@ -82,14 +266,28 @@ export default function SignInScreen() {
                   autoCapitalize="none"
                   keyboardType="email-address"
                   keyboardAppearance={isDark ? 'dark' : 'light'}
+                  onFocus={() => setFocusedInput('email')}
+                  onBlur={() => setFocusedInput(null)}
                 />
+                {email.length > 0 && (
+                  <TouchableOpacity onPress={() => setEmail('')}>
+                    <Ionicons name="close-circle" size={18} color={colors.textTertiary} />
+                  </TouchableOpacity>
+                )}
               </View>
             </View>
 
             <View style={styles.inputGroup}>
               <Text style={styles.label}>Password</Text>
-              <View style={styles.inputContainer}>
-                <Ionicons name="lock-closed-outline" size={20} color={colors.textTertiary} />
+              <View style={[
+                styles.inputContainer,
+                focusedInput === 'password' && styles.inputFocused
+              ]}>
+                <Ionicons 
+                  name="lock-closed-outline" 
+                  size={20} 
+                  color={focusedInput === 'password' ? colors.primary : colors.textTertiary} 
+                />
                 <TextInput
                   style={styles.input}
                   placeholder="Enter your password"
@@ -98,6 +296,8 @@ export default function SignInScreen() {
                   onChangeText={setPassword}
                   secureTextEntry={!showPassword}
                   keyboardAppearance={isDark ? 'dark' : 'light'}
+                  onFocus={() => setFocusedInput('password')}
+                  onBlur={() => setFocusedInput(null)}
                 />
                 <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
                   <Ionicons
@@ -109,7 +309,10 @@ export default function SignInScreen() {
               </View>
             </View>
 
-            <TouchableOpacity style={styles.forgotPassword}>
+            <TouchableOpacity 
+              style={styles.forgotPassword}
+              onPress={() => navigation.navigate('ForgotPassword' as any)}
+            >
               <Text style={styles.forgotPasswordText}>Forgot password?</Text>
             </TouchableOpacity>
 
@@ -117,12 +320,58 @@ export default function SignInScreen() {
               style={[styles.signInButton, (!email || !password) && styles.buttonDisabled]}
               onPress={handleSignIn}
               disabled={!email || !password || isLoading}
+              activeOpacity={0.8}
             >
-              <Text style={styles.signInButtonText}>
-                {isLoading ? 'Signing in...' : 'Sign In'}
-              </Text>
+              {isLoading ? (
+                <ActivityIndicator color={colors.textInverse} />
+              ) : (
+                <>
+                  <Text style={styles.signInButtonText}>Sign In</Text>
+                  <Ionicons name="arrow-forward" size={20} color={colors.textInverse} />
+                </>
+              )}
             </TouchableOpacity>
-          </View>
+
+            {/* Social Login */}
+            <View style={styles.dividerContainer}>
+              <View style={styles.divider} />
+              <Text style={styles.dividerText}>or</Text>
+              <View style={styles.divider} />
+            </View>
+
+            <View style={styles.socialButtons}>
+              <TouchableOpacity 
+                style={styles.socialButton} 
+                activeOpacity={0.7}
+                onPress={handleGooglePress}
+                disabled={isGoogleLoading}
+              >
+                {isGoogleLoading ? (
+                  <ActivityIndicator size="small" color={colors.textPrimary} />
+                ) : (
+                  <>
+                    <Ionicons name="logo-google" size={20} color={colors.textPrimary} />
+                    <Text style={styles.socialButtonText}>Google</Text>
+                  </>
+                )}
+              </TouchableOpacity>
+              <TouchableOpacity 
+                style={styles.socialButton} 
+                activeOpacity={0.7}
+                onPress={handleAppleSignIn}
+                disabled={isAppleLoading}
+              >
+                {isAppleLoading ? (
+                  <ActivityIndicator size="small" color={colors.textPrimary} />
+                ) : (
+                  <>
+                    <Ionicons name="logo-apple" size={20} color={colors.textPrimary} />
+                    <Text style={styles.socialButtonText}>Apple</Text>
+                  </>
+                )}
+              </TouchableOpacity>
+            </View>
+          </Animated.View>
 
           {/* Footer */}
           <View style={styles.footer}>
@@ -156,30 +405,48 @@ const createStyles = (colors: any) => StyleSheet.create({
   },
   header: {
     paddingTop: spacing.lg,
-    marginBottom: spacing.xxxl,
+    marginBottom: spacing.xxl,
   },
   backButton: {
-    width: 40,
-    height: 40,
+    width: 44,
+    height: 44,
+    borderRadius: 12,
+    backgroundColor: colors.surfaceSecondary,
     justifyContent: 'center',
+    alignItems: 'center',
     marginBottom: spacing.xl,
-    marginLeft: -spacing.sm,
+  },
+  logoMini: {
+    width: 48,
+    height: 48,
+    borderRadius: 12,
+    backgroundColor: colors.primary,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: spacing.lg,
+    ...shadows.md,
+  },
+  logoMiniZ: {
+    fontSize: 28,
+    fontWeight: '800',
+    fontStyle: 'italic',
+    color: colors.textInverse,
   },
   title: {
     fontSize: typography.fontSize.xxxl,
     fontWeight: '700',
     color: colors.textPrimary,
-    marginBottom: spacing.sm,
+    marginBottom: spacing.xs,
   },
   subtitle: {
-    fontSize: typography.fontSize.lg,
+    fontSize: typography.fontSize.md,
     color: colors.textSecondary,
   },
   form: {
     flex: 1,
   },
   inputGroup: {
-    marginBottom: spacing.xl,
+    marginBottom: spacing.lg,
   },
   label: {
     fontSize: typography.fontSize.sm,
@@ -193,10 +460,14 @@ const createStyles = (colors: any) => StyleSheet.create({
     backgroundColor: colors.surface,
     borderRadius: borderRadius.lg,
     paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
-    borderWidth: 1,
+    paddingVertical: Platform.OS === 'ios' ? spacing.md + 2 : spacing.md,
+    borderWidth: 1.5,
     borderColor: colors.border,
     gap: spacing.md,
+  },
+  inputFocused: {
+    borderColor: colors.primary,
+    backgroundColor: colors.primaryLight,
   },
   input: {
     flex: 1,
@@ -205,18 +476,23 @@ const createStyles = (colors: any) => StyleSheet.create({
   },
   forgotPassword: {
     alignSelf: 'flex-end',
-    marginBottom: spacing.xxl,
+    marginBottom: spacing.xl,
+    paddingVertical: spacing.xs,
   },
   forgotPasswordText: {
     fontSize: typography.fontSize.sm,
     color: colors.primary,
-    fontWeight: '500',
+    fontWeight: '600',
   },
   signInButton: {
     backgroundColor: colors.primary,
     paddingVertical: spacing.lg,
     borderRadius: borderRadius.lg,
     alignItems: 'center',
+    justifyContent: 'center',
+    flexDirection: 'row',
+    gap: spacing.sm,
+    ...shadows.md,
   },
   buttonDisabled: {
     opacity: 0.5,
@@ -225,6 +501,42 @@ const createStyles = (colors: any) => StyleSheet.create({
     fontSize: typography.fontSize.lg,
     fontWeight: '600',
     color: colors.textInverse,
+  },
+  dividerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: spacing.xl,
+  },
+  divider: {
+    flex: 1,
+    height: 1,
+    backgroundColor: colors.border,
+  },
+  dividerText: {
+    marginHorizontal: spacing.md,
+    fontSize: typography.fontSize.sm,
+    color: colors.textTertiary,
+  },
+  socialButtons: {
+    flexDirection: 'row',
+    gap: spacing.md,
+  },
+  socialButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing.sm,
+    paddingVertical: spacing.md + 2,
+    borderRadius: borderRadius.lg,
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  socialButtonText: {
+    fontSize: typography.fontSize.md,
+    fontWeight: '500',
+    color: colors.textPrimary,
   },
   footer: {
     paddingVertical: spacing.xxl,

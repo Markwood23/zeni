@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Join the Zeni team - Help us build the future of document management for students in Ghana.">
+    <title>Careers - Zeni</title>
+    
+    <link rel="icon" type="image/svg+xml" href="assets/zeni-icon.svg">
+    <link rel="apple-touch-icon" href="assets/icon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="styles.css">
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <style>
+        .page-content {
+            padding-top: 120px;
+            min-height: 100vh;
+            background: var(--bg);
+        }
+        .page-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 24px 80px;
+        }
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 32px;
+            transition: color 0.2s;
+        }
+        .back-link:hover {
+            color: var(--text);
+        }
+        .page-header {
+            text-align: center;
+            margin-bottom: 48px;
+        }
+        .page-header h1 {
+            font-size: 42px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: var(--text);
+        }
+        .page-header p {
+            color: var(--text-secondary);
+            font-size: 18px;
+            max-width: 500px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        .section-block {
+            margin-bottom: 64px;
+        }
+        .section-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 24px;
+            color: var(--text);
+        }
+        .values-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+        @media (max-width: 600px) {
+            .values-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        .openings-card {
+            text-align: center;
+            padding: 48px 32px;
+        }
+        .openings-card .card-icon {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 20px;
+        }
+        .openings-card h3 {
+            font-size: 22px;
+            margin-bottom: 12px;
+        }
+        .openings-card p {
+            max-width: 400px;
+            margin: 0 auto 24px;
+        }
+        .openings-card .card-link {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .openings-card .card-link:hover {
+            text-decoration: underline;
+        }
+        .perks-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+        @media (max-width: 600px) {
+            .perks-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        .perk-card {
+            display: flex;
+            align-items: flex-start;
+            gap: 20px;
+        }
+        .perk-card .card-icon {
+            width: 48px;
+            height: 48px;
+            flex-shrink: 0;
+            margin-bottom: 0;
+        }
+        .perk-content h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: var(--text);
+        }
+        .perk-content p {
+            color: var(--text-secondary);
+            font-size: 14px;
+            line-height: 1.5;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <img src="assets/icon.png" alt="Zeni" class="logo-img">
+                <span>Zeni</span>
+            </a>
+            <div class="nav-links">
+                <a href="index.html#features">Features</a>
+                <a href="index.html#how-it-works">How it works</a>
+                <a href="index.html#download">Download</a>
+            </div>
+            <div class="nav-actions">
+                <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+                    <svg class="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="5"/>
+                        <line x1="12" y1="1" x2="12" y2="3"/>
+                        <line x1="12" y1="21" x2="12" y2="23"/>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+                        <line x1="1" y1="12" x2="3" y2="12"/>
+                        <line x1="21" y1="12" x2="23" y2="12"/>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+                    </svg>
+                    <svg class="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                    </svg>
+                </button>
+                <a href="index.html#download" class="btn btn-primary">Get the App</a>
+            </div>
+            <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+        <a href="index.html#features">Features</a>
+        <a href="index.html#how-it-works">How it works</a>
+        <a href="index.html#download">Download</a>
+    </div>
+
+    <main class="page-content">
+        <div class="page-container">
+            <a href="index.html" class="back-link">
+                <ion-icon name="arrow-back-outline"></ion-icon>
+                Back to Home
+            </a>
+            
+            <div class="page-header">
+                <h1>Join Our Team</h1>
+                <p>Help us build the future of document management for students across Ghana and beyond.</p>
+            </div>
+
+            <div class="section-block">
+                <h2 class="section-title">Our Values</h2>
+                <div class="values-grid">
+                    <div class="bento-card bento-medium">
+                        <div class="card-icon">
+                            <ion-icon name="school-outline" style="font-size: 24px;"></ion-icon>
+                        </div>
+                        <h3>Student-First</h3>
+                        <p>Everything we build starts with understanding student needs.</p>
+                    </div>
+                    
+                    <div class="bento-card bento-medium">
+                        <div class="card-icon">
+                            <ion-icon name="bulb-outline" style="font-size: 24px;"></ion-icon>
+                        </div>
+                        <h3>Innovation</h3>
+                        <p>We challenge conventions and embrace new ideas.</p>
+                    </div>
+                    
+                    <div class="bento-card bento-medium">
+                        <div class="card-icon">
+                            <ion-icon name="people-outline" style="font-size: 24px;"></ion-icon>
+                        </div>
+                        <h3>Collaboration</h3>
+                        <p>The best work happens when we work together.</p>
+                    </div>
+                    
+                    <div class="bento-card bento-medium">
+                        <div class="card-icon">
+                            <ion-icon name="globe-outline" style="font-size: 24px;"></ion-icon>
+                        </div>
+                        <h3>Impact</h3>
+                        <p>We're building for Ghana and the world.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-block">
+                <h2 class="section-title">Open Positions</h2>
+                <div class="bento-card bento-large openings-card">
+                    <div class="card-icon">
+                        <ion-icon name="briefcase-outline" style="font-size: 28px;"></ion-icon>
+                    </div>
+                    <h3>No Open Positions Right Now</h3>
+                    <p>We don't have any open positions at the moment, but we're always looking for talented people. Send us your CV and we'll keep you in mind.</p>
+                    <a href="mailto:careers@zenigh.online" class="card-link">
+                        careers@zenigh.online
+                        <ion-icon name="arrow-forward-outline" style="font-size: 14px;"></ion-icon>
+                    </a>
+                </div>
+            </div>
+
+            <div class="section-block">
+                <h2 class="section-title">Why Work With Us</h2>
+                <div class="perks-grid">
+                    <div class="bento-card bento-medium perk-card">
+                        <div class="card-icon">
+                            <ion-icon name="home-outline" style="font-size: 24px;"></ion-icon>
+                        </div>
+                        <div class="perk-content">
+                            <h3>Remote-Friendly</h3>
+                            <p>Work from anywhere in Ghana or beyond.</p>
+                        </div>
+                    </div>
+                    <div class="bento-card bento-medium perk-card">
+                        <div class="card-icon">
+                            <ion-icon name="time-outline" style="font-size: 24px;"></ion-icon>
+                        </div>
+                        <div class="perk-content">
+                            <h3>Flexible Hours</h3>
+                            <p>We care about results, not when you work.</p>
+                        </div>
+                    </div>
+                    <div class="bento-card bento-medium perk-card">
+                        <div class="card-icon">
+                            <ion-icon name="book-outline" style="font-size: 24px;"></ion-icon>
+                        </div>
+                        <div class="perk-content">
+                            <h3>Learning Budget</h3>
+                            <p>We invest in your growth and development.</p>
+                        </div>
+                    </div>
+                    <div class="bento-card bento-medium perk-card">
+                        <div class="card-icon">
+                            <ion-icon name="rocket-outline" style="font-size: 24px;"></ion-icon>
+                        </div>
+                        <div class="perk-content">
+                            <h3>Small Team, Big Impact</h3>
+                            <p>Your work matters and makes a real difference.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-bottom" style="border-top: none; padding-top: 0;">
+                <p>© 2025 Zeni. Made with ❤️ in Ghana</p>
+                <div class="social-links">
+                    <a href="privacy.html">Privacy</a>
+                    <a href="terms.html">Terms</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

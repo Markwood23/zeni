@@ -5,15 +5,26 @@ import {
   StyleSheet,
   FlatList,
   TouchableOpacity,
+  Image,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useNavigation, CompositeNavigationProp } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import { spacing, borderRadius, typography } from '../constants/theme';
 import { useTheme } from '../context/ThemeContext';
 import { useActivityStore, useDocumentsStore } from '../store';
-import { Activity } from '../types';
+import { Activity, MainTabParamList, HomeStackParamList, Document } from '../types';
+
+// Composite navigation type for navigating from tab to nested stack
+type NavigationProp = CompositeNavigationProp<
+  BottomTabNavigationProp<MainTabParamList, 'Activity'>,
+  NativeStackNavigationProp<HomeStackParamList>
+>;
 
 export default function ActivityScreen() {
+  const navigation = useNavigation<NavigationProp>();
   const { activities, clearActivities } = useActivityStore();
   const { documents } = useDocumentsStore();
   const { colors, isDark } = useTheme();
@@ -35,14 +46,42 @@ export default function ActivityScreen() {
         return 'sparkles-outline';
       case 'upload':
         return 'cloud-upload-outline';
+      case 'delete':
+        return 'trash-outline';
+      case 'move':
+        return 'folder-outline';
+      case 'import':
+        return 'download-outline';
       default:
         return 'document-outline';
     }
   };
 
   const getActivityColor = (type: Activity['type']): string => {
-    // Grayscale design - use neutral colors for all activity icons
-    return colors.textSecondary;
+    switch (type) {
+      case 'scan':
+        return colors.scanIcon;
+      case 'edit':
+        return colors.editIcon;
+      case 'convert':
+        return colors.convertIcon;
+      case 'fax':
+        return colors.faxedIcon;
+      case 'share':
+        return colors.shareIcon;
+      case 'ai_chat':
+        return colors.askAiIcon;
+      case 'upload':
+        return colors.uploadedIcon;
+      case 'delete':
+        return colors.deleteIcon;
+      case 'move':
+        return colors.folderIcon;
+      case 'import':
+        return colors.importedIcon;
+      default:
+        return colors.primary;
+    }
   };
 
   const formatDate = (date: Date) => {
@@ -89,24 +128,59 @@ export default function ActivityScreen() {
   const groupedActivities = groupActivitiesByDate(activities);
 
   const renderActivityItem = ({ item }: { item: Activity }) => {
-    const doc = item.documentId ? documents.find((d) => d.id === item.documentId) : null;
+    const doc = item.documentId ? documents.find((d: Document) => d.id === item.documentId) : null;
     const iconColor = getActivityColor(item.type);
 
+    const handlePress = () => {
+      if (doc) {
+        // Navigate to Home tab's DocumentView screen
+        navigation.navigate('Home', { 
+          screen: 'DocumentView', 
+          params: { documentId: doc.id } 
+        } as any);
+      }
+    };
+
     return (
-      <TouchableOpacity style={styles.activityCard}>
-        <View style={[styles.activityIcon, { backgroundColor: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.015)' }]}>
-          <Ionicons name={getActivityIcon(item.type)} size={20} color={iconColor} />
-        </View>
+      <TouchableOpacity 
+        style={styles.activityCard}
+        onPress={handlePress}
+        disabled={!doc}
+      >
+        {/* Document Thumbnail */}
+        {doc && doc.thumbnail ? (
+          <View style={styles.thumbnailContainer}>
+            <Image 
+              source={{ uri: doc.thumbnail }} 
+              style={styles.thumbnail}
+              resizeMode="cover"
+            />
+          </View>
+        ) : (
+          <View style={[styles.activityIcon, { backgroundColor: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.015)' }]}>
+            <Ionicons name={getActivityIcon(item.type)} size={20} color={iconColor} />
+          </View>
+        )}
         <View style={styles.activityInfo}>
           <Text style={styles.activityTitle}>{item.title}</Text>
-          {item.description && (
+          {doc && (
+            <Text style={styles.documentName} numberOfLines={1}>
+              {doc.name}
+            </Text>
+          )}
+          {item.description && !doc && (
             <Text style={styles.activityDescription} numberOfLines={1}>
               {item.description}
             </Text>
           )}
-          <Text style={styles.activityTime}>{formatDate(item.createdAt)}</Text>
+          <View style={styles.activityMeta}>
+            <Ionicons name={getActivityIcon(item.type)} size={12} color={colors.textTertiary} />
+            <Text style={styles.activityTime}>{formatDate(item.createdAt)}</Text>
+          </View>
         </View>
-        <Ionicons name="chevron-forward" size={16} color={colors.textTertiary} />
+        {doc && (
+          <Ionicons name="chevron-forward" size={16} color={colors.textTertiary} />
+        )}
       </TouchableOpacity>
     );
   };
@@ -206,12 +280,24 @@ const createStyles = (colors: any) => StyleSheet.create({
     elevation: 2,
   },
   activityIcon: {
-    width: 44,
-    height: 44,
+    width: 50,
+    height: 50,
     borderRadius: borderRadius.md,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: spacing.md,
+  },
+  thumbnailContainer: {
+    width: 50,
+    height: 50,
+    borderRadius: borderRadius.md,
+    marginRight: spacing.md,
+    overflow: 'hidden',
+    backgroundColor: colors.borderLight,
+  },
+  thumbnail: {
+    width: '100%',
+    height: '100%',
   },
   activityInfo: {
     flex: 1,
@@ -220,12 +306,23 @@ const createStyles = (colors: any) => StyleSheet.create({
     fontSize: typography.fontSize.md,
     fontWeight: '600',
     color: colors.textPrimary,
-    marginBottom: spacing.xs,
+    marginBottom: 2,
+  },
+  documentName: {
+    fontSize: typography.fontSize.sm,
+    color: colors.primary,
+    marginBottom: 2,
   },
   activityDescription: {
     fontSize: typography.fontSize.sm,
     color: colors.textSecondary,
-    marginBottom: spacing.xs,
+    marginBottom: 2,
+  },
+  activityMeta: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+    marginTop: 2,
   },
   activityTime: {
     fontSize: typography.fontSize.xs,
