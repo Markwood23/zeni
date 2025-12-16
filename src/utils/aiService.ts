@@ -4,14 +4,12 @@
  * Full access to user data and app control for comprehensive assistance
  */
 
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as FileSystem from 'expo-file-system';
 import { Linking } from 'react-native';
+import Constants from 'expo-constants';
 
-const AI_API_KEY_STORAGE = '@zeni_ai_api_key';
-// API key should be set by user in app settings or via environment variable
-// DO NOT hardcode API keys here
-const DEFAULT_API_KEY = '';
+// Get API key from environment variable (set in Vercel/EAS)
+const OPENAI_API_KEY = Constants.expoConfig?.extra?.openaiApiKey || process.env.EXPO_PUBLIC_OPENAI_API_KEY || '';
 
 export interface AIServiceConfig {
   apiKey?: string;
@@ -207,57 +205,21 @@ export interface FullAppContext {
 }
 
 class AIService {
-  private apiKey: string | null = DEFAULT_API_KEY;
+  private apiKey: string = OPENAI_API_KEY;
   private model: string = 'gpt-4o';  // Upgraded to GPT-4o for max capabilities
   private maxTokens: number = 4000;  // Increased for longer, more detailed responses
   private baseUrl: string = 'https://api.openai.com/v1';
 
   constructor() {
-    this.loadApiKey();
-  }
-
-  private async loadApiKey(): Promise<void> {
-    try {
-      const key = await AsyncStorage.getItem(AI_API_KEY_STORAGE);
-      if (key) {
-        this.apiKey = key;
-      } else {
-        // Use default key if no custom key is set
-        this.apiKey = DEFAULT_API_KEY;
-      }
-    } catch (error) {
-      console.log('Failed to load AI API key:', error);
-      this.apiKey = DEFAULT_API_KEY;
-    }
-  }
-
-  async setApiKey(key: string): Promise<void> {
-    this.apiKey = key;
-    try {
-      await AsyncStorage.setItem(AI_API_KEY_STORAGE, key);
-    } catch (error) {
-      console.log('Failed to save AI API key:', error);
-    }
-  }
-
-  async clearApiKey(): Promise<void> {
-    this.apiKey = null;
-    try {
-      await AsyncStorage.removeItem(AI_API_KEY_STORAGE);
-    } catch (error) {
-      console.log('Failed to clear AI API key:', error);
-    }
+    // API key is loaded from environment variable
   }
 
   isConfigured(): boolean {
-    return true; // Always configured with default or custom key
+    return !!this.apiKey && this.apiKey.length > 0;
   }
 
-  async getApiKey(): Promise<string | null> {
-    if (!this.apiKey) {
-      await this.loadApiKey();
-    }
-    return this.apiKey || DEFAULT_API_KEY;
+  getApiKey(): string {
+    return this.apiKey;
   }
 
   /**
