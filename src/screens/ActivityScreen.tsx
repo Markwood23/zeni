@@ -162,10 +162,10 @@ export default function ActivityScreen() {
         disabled={!doc}
       >
         {/* Document Thumbnail */}
-        {doc && doc.thumbnail ? (
+        {doc && doc.thumbnailPath ? (
           <View style={styles.thumbnailContainer}>
             <Image 
-              source={{ uri: doc.thumbnail }} 
+              source={{ uri: doc.thumbnailPath }} 
               style={styles.thumbnail}
               resizeMode="cover"
             />

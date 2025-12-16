@@ -30,6 +30,9 @@ export interface User {
   school?: string;
   level?: string;
   avatarUrl?: string;
+  avatar?: string; // Alternative avatar field for social auth
+  // Auth provider tracking
+  authProvider?: 'email' | 'google' | 'apple';
   // Hybrid account system
   accountType: AccountType;
   verification?: StudentVerification;

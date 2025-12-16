@@ -353,9 +353,8 @@ export default function AIChatScreen() {
 
   useEffect(() => {
     // Check if AI is configured
-    aiService.getApiKey().then((key) => {
-      setIsAiConfigured(!!key);
-    });
+    const key = aiService.getApiKey();
+    setIsAiConfigured(!!key);
   }, []);
 
   const handleSend = async () => {

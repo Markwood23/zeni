@@ -223,6 +223,10 @@ class AIService {
     return this.apiKey;
   }
 
+  setApiKey(key: string): void {
+    this.apiKey = key;
+  }
+
   /**
    * Send a chat completion request to OpenAI with full app context
    */
