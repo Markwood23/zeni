@@ -308,3 +308,5 @@ faqItems.forEach(item => {
         }
     });
 });
+
+// Fax animation is inline in HTML

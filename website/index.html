@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Zeni - The smart document workspace built for Ghanaian students. Scan, edit, convert, and fax documents.">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="description" content="Zeni - The smart document workspace built for Ghanaian students. Scan, edit, convert, and share documents.">
     <title>Zeni - Smart Document Workspace for Students</title>
     
     <link rel="icon" type="image/svg+xml" href="assets/zeni-icon.svg">
@@ -14,7 +15,7 @@
     <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
     
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles.css?v=18">
 </head>
 <body>
     <!-- Navigation -->
@@ -80,7 +81,7 @@
                 <span class="hero-title-line">Made Simple.</span>
             </h1>
             <p class="hero-subtitle">
-                Scan, edit, convert, and fax documents right from your phone. 
+                Scan, edit, convert, and share documents right from your phone. 
                 The smartest way for students to handle paperwork.
             </p>
             
@@ -248,32 +249,67 @@
                     </div>
                 </div>
 
-                <!-- Fax Card - Dark -->
-                <div class="bento-card bento-large card-fax card-dark">
+                <!-- Send & Share Card -->
+                <div class="bento-card bento-large card-send card-dark">
                     <div class="card-content">
                         <div class="card-icon">
-                            <ion-icon name="call-outline" style="font-size: 28px;"></ion-icon>
+                            <ion-icon name="send-outline" style="font-size: 28px;"></ion-icon>
                         </div>
-                        <h3>Send Fax Worldwide</h3>
-                        <p>Need to fax a document? Send faxes to any number globally without a fax machine. Perfect for official submissions.</p>
+                        <h3>Send & Share</h3>
+                        <p>Share documents instantly via email or Zeni link. Recipients get a beautiful preview page to view, download, or edit based on your permissions.</p>
                     </div>
                     <div class="card-visual">
-                        <div class="fax-status">
-                            <div class="fax-row">
-                                <span class="fax-label">To</span>
-                                <span class="fax-value fax-number">+1 (555) 123-4567</span>
+                        <div class="share-preview">
+                            <div class="share-link-box">
+                                <div class="share-link-icon">
+                                    <ion-icon name="link-outline"></ion-icon>
+                                </div>
+                                <div class="share-link-content">
+                                    <span class="share-link-label">Share Link</span>
+                                    <span class="share-link-url" id="shareUrl">zeni.app/s/abc123</span>
+                                </div>
+                                <div class="share-copy-btn" id="shareCopyBtn">
+                                    <ion-icon name="copy-outline" id="copyIcon"></ion-icon>
+                                </div>
                             </div>
-                            <div class="fax-row">
-                                <span class="fax-label">Pages</span>
-                                <span class="fax-value fax-pages">3</span>
+                            <div class="share-options">
+                                <div class="share-option">
+                                    <ion-icon name="mail-outline"></ion-icon>
+                                    <span>Email</span>
+                                </div>
+                                <div class="share-option">
+                                    <ion-icon name="logo-whatsapp"></ion-icon>
+                                    <span>WhatsApp</span>
+                                </div>
+                                <div class="share-option active">
+                                    <ion-icon name="link-outline"></ion-icon>
+                                    <span>Link</span>
+                                </div>
                             </div>
-                            <div class="fax-row">
-                                <span class="fax-label">Status</span>
-                                <span class="fax-status-badge"><span class="status-dot"></span><span class="fax-status-text">Sending...</span></span>
+                            <div class="share-permissions">
+                                <span class="permission-label">Permissions:</span>
+                                <span class="permission-badge">View</span>
+                                <span class="permission-badge">Download</span>
                             </div>
-                            <div class="fax-progress">
-                                <div class="fax-progress-bar"></div>
-                            </div>
+                            <script>
+                            (function(){
+                                var copyBtn = document.getElementById('shareCopyBtn');
+                                var copyIcon = document.getElementById('copyIcon');
+                                var copied = false;
+                                setInterval(function(){
+                                    if(!copied){
+                                        copyIcon.setAttribute('name', 'checkmark-outline');
+                                        copyBtn.classList.add('copied');
+                                        copied = true;
+                                        setTimeout(function(){
+                                            copyIcon.setAttribute('name', 'copy-outline');
+                                            copyBtn.classList.remove('copied');
+                                            copied = false;
+                                        }, 2000);
+                                    }
+                                }, 4000);
+                            })();
+                            </script>
                         </div>
                     </div>
                 </div>
