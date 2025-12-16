@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import {
   View,
   Text,
@@ -9,6 +9,7 @@ import {
   TextInput,
   Alert,
   Share,
+  RefreshControl,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useRoute, RouteProp, CommonActions } from '@react-navigation/native';
@@ -44,6 +45,22 @@ export default function DocumentsHubScreen() {
   const [isSearching, setIsSearching] = useState(false);
   const { colors, isDark } = useTheme();
   const styles = createStyles(colors);
+  const [refreshing, setRefreshing] = useState(false);
+  const flatListRef = useRef<FlatList>(null);
+
+  // Pull-to-refresh handler
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    // Scroll to top
+    flatListRef.current?.scrollToOffset({ offset: 0, animated: true });
+    // Reset search on refresh
+    setSearchQuery('');
+    setIsSearching(false);
+    // Simulate refresh delay
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 1000);
+  }, []);
 
   // Auto-open search when navigated with openSearch param
   useEffect(() => {
@@ -438,6 +455,7 @@ export default function DocumentsHubScreen() {
         </View>
 
         <FlatList
+          ref={flatListRef}
           key={viewMode}
           data={filteredDocuments}
           renderItem={viewMode === 'list' ? renderDocumentItem : renderDocumentGridItem}
@@ -447,6 +465,14 @@ export default function DocumentsHubScreen() {
           columnWrapperStyle={viewMode === 'grid' ? styles.gridRow : undefined}
           ListEmptyComponent={renderEmptyState}
           showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              tintColor={colors.primary}
+              colors={[colors.primary]}
+            />
+          }
         />
       </View>
     </SafeAreaView>

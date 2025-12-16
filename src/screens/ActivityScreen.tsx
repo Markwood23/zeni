@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import {
   View,
   Text,
@@ -6,6 +6,7 @@ import {
   FlatList,
   TouchableOpacity,
   Image,
+  RefreshControl,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, CompositeNavigationProp } from '@react-navigation/native';
@@ -29,6 +30,19 @@ export default function ActivityScreen() {
   const { documents } = useDocumentsStore();
   const { colors, isDark } = useTheme();
   const styles = createStyles(colors);
+  const [refreshing, setRefreshing] = useState(false);
+  const flatListRef = useRef<FlatList>(null);
+
+  // Pull-to-refresh handler
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    // Scroll to top
+    flatListRef.current?.scrollToOffset({ offset: 0, animated: true });
+    // Simulate refresh delay
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 1000);
+  }, []);
 
   const getActivityIcon = (type: Activity['type']): keyof typeof Ionicons.glyphMap => {
     switch (type) {
@@ -208,10 +222,19 @@ export default function ActivityScreen() {
 
       {/* Activity List */}
       <FlatList
+        ref={flatListRef}
         data={groupedActivities}
         renderItem={renderSection}
         keyExtractor={(item) => item.date}
         contentContainerStyle={styles.listContent}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor={colors.primary}
+            colors={[colors.primary]}
+          />
+        }
         ListEmptyComponent={
           <View style={styles.emptyState}>
             <View style={styles.emptyIcon}>

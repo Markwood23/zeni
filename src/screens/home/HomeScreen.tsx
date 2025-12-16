@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback, useRef } from 'react';
 import {
   View,
   Text,
@@ -8,6 +8,7 @@ import {
   Dimensions,
   TextInput,
   Alert,
+  RefreshControl,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
@@ -110,8 +111,23 @@ export default function HomeScreen() {
   const { unreadCount } = useNotificationsStore();
   const { colors, isDark } = useTheme();
   const [searchQuery, setSearchQuery] = useState('');
+  const [refreshing, setRefreshing] = useState(false);
+  const scrollViewRef = useRef<ScrollView>(null);
 
   const greeting = user?.firstName ? `Hi ${user.firstName},` : 'Hi there,';
+  
+  // Pull-to-refresh handler - scrolls to top and refreshes data
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    // Scroll to top
+    scrollViewRef.current?.scrollTo({ y: 0, animated: true });
+    // Clear search query on refresh
+    setSearchQuery('');
+    // Simulate refresh delay (in production, this would refetch data)
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 1000);
+  }, []);
   
   // Filter recent docs based on search
   const filteredDocs = useMemo(() => {
@@ -141,9 +157,18 @@ export default function HomeScreen() {
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       <ScrollView
+        ref={scrollViewRef}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor={colors.primary}
+            colors={[colors.primary]}
+          />
+        }
       >
         {/* Header */}
         <View style={styles.header}>

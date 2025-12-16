@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   ScrollView,
   Alert,
   Switch,
+  RefreshControl,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
@@ -24,6 +25,19 @@ export default function ProfileScreen() {
   const { user, logout, setOnboarded } = useUserStore();
   const { documents } = useDocumentsStore();
   const { colors, isDark, themeMode, setThemeMode, primaryColor, hasSeenColorPicker, setHasSeenColorPicker } = useTheme();
+  const [refreshing, setRefreshing] = useState(false);
+  const scrollViewRef = useRef<ScrollView>(null);
+
+  // Pull-to-refresh handler
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    // Scroll to top
+    scrollViewRef.current?.scrollTo({ y: 0, animated: true });
+    // Simulate refresh delay
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 1000);
+  }, []);
 
   // Show color picker alert for new users
   useEffect(() => {
@@ -125,7 +139,18 @@ export default function ProfileScreen() {
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
-      <ScrollView contentContainerStyle={styles.content}>
+      <ScrollView 
+        ref={scrollViewRef}
+        contentContainerStyle={styles.content}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor={colors.primary}
+            colors={[colors.primary]}
+          />
+        }
+      >
         {/* Header */}
         <View style={styles.header}>
           <Text style={[styles.headerTitle, { color: colors.textPrimary }]}>Profile</Text>

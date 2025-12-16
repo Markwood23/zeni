@@ -1,4 +1,12 @@
 // ========================================
+// Scroll to Top on Page Load/Refresh
+// ========================================
+if ('scrollRestoration' in history) {
+    history.scrollRestoration = 'manual';
+}
+window.scrollTo(0, 0);
+
+// ========================================
 // Theme Toggle
 // ========================================
 const themeToggle = document.getElementById('themeToggle');
