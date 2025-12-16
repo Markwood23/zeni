@@ -22,7 +22,7 @@ const editTools = [
   { id: 'text', icon: 'text' as keyof typeof Ionicons.glyphMap, title: 'Add Text', description: 'Insert text fields', colorKey: 'askAiIcon' },
   { id: 'sign', icon: 'pencil' as keyof typeof Ionicons.glyphMap, title: 'eSign', description: 'Add your signature', colorKey: 'editIcon' },
   { id: 'markup', icon: 'brush' as keyof typeof Ionicons.glyphMap, title: 'Mark Up', description: 'Draw & highlight', colorKey: 'convertIcon' },
-  { id: 'shapes', icon: 'shapes' as keyof typeof Ionicons.glyphMap, title: 'Shapes', description: 'Checkmarks, lines', colorKey: 'faxedIcon' },
+  { id: 'shapes', icon: 'shapes' as keyof typeof Ionicons.glyphMap, title: 'Shapes', description: 'Checkmarks, lines', colorKey: 'shareIcon' },
 ];
 
 export default function EditScreen() {

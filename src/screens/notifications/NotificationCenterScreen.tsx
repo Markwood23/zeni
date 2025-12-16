@@ -20,11 +20,11 @@ type NavigationProp = NativeStackNavigationProp<HomeStackParamList, 'Notificatio
 
 const getNotificationIcon = (type: NotificationType): { name: keyof typeof Ionicons.glyphMap; color: string } => {
   switch (type) {
-    case 'fax_sent':
+    case 'share_sent':
       return { name: 'paper-plane', color: '#017DE9' };
-    case 'fax_delivered':
+    case 'share_delivered':
       return { name: 'checkmark-circle', color: '#34C759' };
-    case 'fax_failed':
+    case 'share_failed':
       return { name: 'alert-circle', color: '#FF3B30' };
     case 'scan_complete':
       return { name: 'scan', color: '#5856D6' };

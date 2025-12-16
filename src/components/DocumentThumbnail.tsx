@@ -4,7 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../context/ThemeContext';
 import { borderRadius } from '../constants/theme';
 
-type DocumentType = 'scanned' | 'uploaded' | 'edited' | 'faxed' | 'converted' | 'created';
+type DocumentType = 'scanned' | 'uploaded' | 'edited' | 'shared' | 'converted' | 'created';
 type ThumbnailSize = 'small' | 'medium' | 'large';
 
 interface DocumentThumbnailProps {
@@ -22,8 +22,8 @@ const getDocumentIcon = (type: DocumentType): keyof typeof Ionicons.glyphMap => 
       return 'cloud-upload';
     case 'edited':
       return 'create';
-    case 'faxed':
-      return 'print';
+    case 'shared':
+      return 'send';
     case 'converted':
       return 'swap-horizontal';
     case 'created':

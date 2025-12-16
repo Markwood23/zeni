@@ -196,12 +196,12 @@ export default function DocumentViewScreen() {
     );
   };
 
-  const handleFax = () => {
+  const handleSend = () => {
     navigation.dispatch(
       CommonActions.navigate({
         name: 'Home',
         params: {
-          screen: 'FaxSend',
+          screen: 'SendShare',
           params: { documentId: document.id },
         },
       })
@@ -402,7 +402,7 @@ export default function DocumentViewScreen() {
     { id: 'share', icon: 'share-outline' as keyof typeof Ionicons.glyphMap, label: 'Share', onPress: handleShare },
     { id: 'edit', icon: 'create-outline' as keyof typeof Ionicons.glyphMap, label: 'Edit', onPress: handleEdit },
     { id: 'convert', icon: 'swap-horizontal-outline' as keyof typeof Ionicons.glyphMap, label: 'Convert', onPress: handleConvert },
-    { id: 'fax', icon: 'print-outline' as keyof typeof Ionicons.glyphMap, label: 'Fax', onPress: handleFax },
+    { id: 'send', icon: 'send-outline' as keyof typeof Ionicons.glyphMap, label: 'Send', onPress: handleSend },
     { id: 'delete', icon: 'trash-outline' as keyof typeof Ionicons.glyphMap, label: 'Delete', onPress: handleDelete },
   ];
 

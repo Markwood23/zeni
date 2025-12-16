@@ -206,12 +206,12 @@ export const PREMIUM_FEATURES = [
     premiumLimit: 'Unlimited',
   },
   {
-    id: 'fax',
+    id: 'share',
     icon: 'send-outline',
-    title: 'Free Faxing',
-    description: 'Send faxes to universities and institutions',
-    freeLimit: '5 pages/month',
-    premiumLimit: '50 pages/month',
+    title: 'Send & Share',
+    description: 'Share documents via email, WhatsApp, or Zeni link',
+    freeLimit: '10 shares/month',
+    premiumLimit: 'Unlimited',
   },
   {
     id: 'ai',

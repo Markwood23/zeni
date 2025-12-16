@@ -326,20 +326,20 @@ export default function HomeScreen() {
           </View>
         )}
 
-        {/* Quick Actions - Fax Center - Hide when searching */}
+        {/* Quick Actions - Send & Share - Hide when searching */}
         {!searchQuery && (
           <TouchableOpacity
-            style={[styles.faxBanner, { backgroundColor: colors.surface }]}
-            onPress={() => navigation.navigate('Fax' as any)}
+            style={[styles.sendBanner, { backgroundColor: colors.surface }]}
+            onPress={() => navigation.navigate('Send' as any)}
           >
-            <View style={styles.faxIcon}>
-              <Ionicons name="print" size={24} color={colors.faxedIcon} />
+            <View style={styles.sendIcon}>
+              <Ionicons name="send" size={24} color={colors.primary} />
             </View>
-            <View style={styles.faxContent}>
-              <Text style={[styles.faxTitle, { color: colors.textPrimary }]}>Fax Center</Text>
-              <Text style={[styles.faxDescription, { color: colors.textTertiary }]}>Send documents to institutions</Text>
+            <View style={styles.sendContent}>
+              <Text style={[styles.sendTitle, { color: colors.textPrimary }]}>Send & Share</Text>
+              <Text style={[styles.sendDescription, { color: colors.textTertiary }]}>Share documents via email or link</Text>
             </View>
-            <Ionicons name="chevron-forward" size={20} color={colors.faxedIcon} />
+            <Ionicons name="chevron-forward" size={20} color={colors.primary} />
           </TouchableOpacity>
         )}
       </ScrollView>
@@ -530,7 +530,7 @@ const styles = StyleSheet.create({
   recentCardMeta: {
     fontSize: typography.fontSize.xs,
   },
-  faxBanner: {
+  sendBanner: {
     flexDirection: 'row',
     alignItems: 'center',
     marginHorizontal: spacing.xxl,
@@ -538,7 +538,7 @@ const styles = StyleSheet.create({
     padding: spacing.lg,
     ...shadows.sm,
   },
-  faxIcon: {
+  sendIcon: {
     width: 48,
     height: 48,
     borderRadius: borderRadius.md,
@@ -546,15 +546,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginRight: spacing.md,
   },
-  faxContent: {
+  sendContent: {
     flex: 1,
   },
-  faxTitle: {
+  sendTitle: {
     fontSize: typography.fontSize.md,
     fontWeight: '600',
     marginBottom: spacing.xs,
   },
-  faxDescription: {
+  sendDescription: {
     fontSize: typography.fontSize.sm,
   },
   emptyState: {

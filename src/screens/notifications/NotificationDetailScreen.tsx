@@ -21,11 +21,11 @@ type RouteType = RouteProp<HomeStackParamList, 'NotificationDetail'>;
 
 const getNotificationIcon = (type: NotificationType): { name: keyof typeof Ionicons.glyphMap; color: string } => {
   switch (type) {
-    case 'fax_sent':
+    case 'share_sent':
       return { name: 'paper-plane', color: '#017DE9' };
-    case 'fax_delivered':
+    case 'share_delivered':
       return { name: 'checkmark-circle', color: '#34C759' };
-    case 'fax_failed':
+    case 'share_failed':
       return { name: 'alert-circle', color: '#FF3B30' };
     case 'scan_complete':
       return { name: 'scan', color: '#5856D6' };
@@ -50,9 +50,9 @@ const getNotificationIcon = (type: NotificationType): { name: keyof typeof Ionic
 
 const getNotificationTypeLabel = (type: NotificationType): string => {
   switch (type) {
-    case 'fax_sent': return 'Fax';
-    case 'fax_delivered': return 'Delivered';
-    case 'fax_failed': return 'Failed';
+    case 'share_sent': return 'Shared';
+    case 'share_delivered': return 'Delivered';
+    case 'share_failed': return 'Failed';
     case 'scan_complete': return 'Scan';
     case 'convert_complete': return 'Convert';
     case 'ai_complete': return 'AI';
@@ -195,16 +195,16 @@ export default function NotificationDetailScreen() {
         </Text>
 
         {/* Contextual hint - only show if relevant */}
-        {(notification.type === 'fax_sent' || notification.type === 'fax_failed' || notification.type === 'storage_warning') && (
+        {(notification.type === 'share_sent' || notification.type === 'share_failed' || notification.type === 'storage_warning') && (
           <Text style={[styles.hint, { color: colors.textTertiary }]}>
-            {notification.type === 'fax_sent' && "You'll be notified when it's delivered."}
-            {notification.type === 'fax_failed' && "Check the number and try again."}
+            {notification.type === 'share_sent' && "The recipient has been notified."}
+            {notification.type === 'share_failed' && "Check the email and try again."}
             {notification.type === 'storage_warning' && "Free up space or upgrade your plan."}
           </Text>
         )}
 
         {/* Actions */}
-        {(notification.actionRoute || notification.documentId || notification.type === 'fax_failed' || notification.type === 'storage_warning') && (
+        {(notification.actionRoute || notification.documentId || notification.type === 'share_failed' || notification.type === 'storage_warning') && (
           <View style={styles.actions}>
             {(notification.actionRoute || notification.documentId) && (
               <TouchableOpacity
@@ -219,10 +219,10 @@ export default function NotificationDetailScreen() {
               </TouchableOpacity>
             )}
 
-            {notification.type === 'fax_failed' && (
+            {notification.type === 'share_failed' && (
               <TouchableOpacity
                 style={[styles.secondaryBtn, { borderColor: colors.borderLight }]}
-                onPress={() => navigation.navigate('FaxSend' as any)}
+                onPress={() => navigation.navigate('SendShare' as any)}
                 activeOpacity={0.7}
               >
                 <Text style={[styles.secondaryBtnText, { color: colors.textPrimary }]}>

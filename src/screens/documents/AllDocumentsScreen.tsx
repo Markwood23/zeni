@@ -34,7 +34,7 @@ const filters: { key: DocumentFilter; label: string; icon: keyof typeof Ionicons
   { key: 'scanned', label: 'Scanned', icon: 'scan-outline' },
   { key: 'uploaded', label: 'Uploaded', icon: 'cloud-upload-outline' },
   { key: 'edited', label: 'Edited', icon: 'create-outline' },
-  { key: 'faxed', label: 'Faxed', icon: 'print-outline' },
+  { key: 'shared', label: 'Shared', icon: 'send-outline' },
 ];
 
 const sortOptions: { key: SortOption; label: string }[] = [
@@ -143,13 +143,13 @@ export default function AllDocumentsScreen() {
           },
         },
         {
-          text: 'Fax',
+          text: 'Send',
           onPress: () => {
             navigation.dispatch(
               CommonActions.navigate({
                 name: 'Home',
                 params: {
-                  screen: 'FaxSend',
+                  screen: 'SendShare',
                   params: { documentId: doc.id },
                 },
               })
@@ -216,8 +216,8 @@ export default function AllDocumentsScreen() {
         return 'cloud-upload';
       case 'edited':
         return 'create';
-      case 'faxed':
-        return 'print';
+      case 'shared':
+        return 'send';
       case 'imported':
         return 'download';
       case 'converted':
@@ -235,8 +235,8 @@ export default function AllDocumentsScreen() {
         return colors?.uploadedIcon || colors?.primary;
       case 'edited':
         return colors?.editIcon || colors?.primary;
-      case 'faxed':
-        return colors?.faxedIcon || colors?.primary;
+      case 'shared':
+        return colors?.primary;
       case 'imported':
         return colors?.importedIcon || colors?.primary;
       case 'converted':

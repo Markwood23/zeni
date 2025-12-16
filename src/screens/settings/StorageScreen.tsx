@@ -12,14 +12,14 @@ import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { spacing, borderRadius, typography } from '../../constants/theme';
 import { useTheme } from '../../context/ThemeContext';
-import { useDocumentsStore, useFaxStore, useSignaturesStore } from '../../store';
+import { useDocumentsStore, useShareStore, useSignaturesStore } from '../../store';
 
 export default function StorageScreen() {
   const navigation = useNavigation();
   const { colors } = useTheme();
   
   const { documents } = useDocumentsStore();
-  const { faxJobs, clearAllFaxes } = useFaxStore();
+  const { shareJobs, clearAllShares } = useShareStore();
   const { signatures } = useSignaturesStore();
 
   // Calculate actual storage usage from store data
@@ -30,18 +30,18 @@ export default function StorageScreen() {
     
     const documentsSize = uploadedDocs.length * 0.5; // MB
     const scansSize = scannedDocs.length * 0.3; // MB
-    const faxesSize = faxJobs.length * 0.2; // MB
+    const sharesSize = shareJobs.length * 0.2; // MB
     const signaturesSize = signatures.length * 0.01; // MB
     const cacheSize = 2.5; // Estimated cache size
     
     return [
       { label: 'Documents', size: Math.max(documentsSize, 0.1), color: colors.uploadedIcon, count: uploadedDocs.length },
       { label: 'Scans', size: Math.max(scansSize, 0.1), color: colors.scanIcon, count: scannedDocs.length },
-      { label: 'Faxes', size: Math.max(faxesSize, 0.1), color: colors.faxedIcon, count: faxJobs.length },
+      { label: 'Shares', size: Math.max(sharesSize, 0.1), color: colors.primary, count: shareJobs.length },
       { label: 'Signatures', size: Math.max(signaturesSize, 0.01), color: colors.accent, count: signatures.length },
       { label: 'Cache', size: cacheSize, color: colors.error, count: null },
     ];
-  }, [documents, faxJobs, signatures, colors]);
+  }, [documents, shareJobs, signatures, colors]);
 
   const totalUsed = storageData.reduce((sum, item) => sum + item.size, 0);
   const totalStorage = 200; // MB (simulated limit)
@@ -59,24 +59,24 @@ export default function StorageScreen() {
     );
   };
 
-  const handleDeleteAllFaxes = () => {
-    if (faxJobs.length === 0) {
-      Alert.alert('No Faxes', 'You have no faxes to delete.');
+  const handleDeleteAllShares = () => {
+    if (shareJobs.length === 0) {
+      Alert.alert('No Shares', 'You have no share history to delete.');
       return;
     }
     
-    const faxItem = storageData.find(s => s.label === 'Faxes');
+    const shareItem = storageData.find(s => s.label === 'Shares');
     Alert.alert(
-      'Delete All Faxes',
-      `This will permanently delete all ${faxJobs.length} faxes and free up ${faxItem?.size.toFixed(1)} MB. This action cannot be undone.`,
+      'Delete All Shares',
+      `This will permanently delete all ${shareJobs.length} share records and free up ${shareItem?.size.toFixed(1)} MB. This action cannot be undone.`,
       [
         { text: 'Cancel', style: 'cancel' },
         { 
           text: 'Delete', 
           style: 'destructive', 
           onPress: () => {
-            clearAllFaxes();
-            Alert.alert('Success', 'All faxes deleted');
+            clearAllShares();
+            Alert.alert('Success', 'All share history deleted');
           }
         },
       ]
@@ -176,14 +176,14 @@ export default function StorageScreen() {
 
           <TouchableOpacity 
             style={[styles.actionItem, { borderBottomColor: colors.borderLight }]}
-            onPress={handleDeleteAllFaxes}
+            onPress={handleDeleteAllShares}
           >
-            <View style={[styles.actionIcon, { backgroundColor: colors.faxedIcon + '15' }]}>
-              <Ionicons name="document-text-outline" size={20} color={colors.faxedIcon} />
+            <View style={[styles.actionIcon, { backgroundColor: colors.primary + '15' }]}>
+              <Ionicons name="send-outline" size={20} color={colors.primary} />
             </View>
             <View style={styles.actionInfo}>
-              <Text style={[styles.actionTitle, { color: colors.textPrimary }]}>Delete All Faxes</Text>
-              <Text style={[styles.actionDesc, { color: colors.textTertiary }]}>Free up 12.1 MB</Text>
+              <Text style={[styles.actionTitle, { color: colors.textPrimary }]}>Delete Share History</Text>
+              <Text style={[styles.actionDesc, { color: colors.textTertiary }]}>Clear share records</Text>
             </View>
             <Ionicons name="chevron-forward" size={20} color={colors.textTertiary} />
           </TouchableOpacity>

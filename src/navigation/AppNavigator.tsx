@@ -28,8 +28,8 @@ import EditDocumentScreen from '../screens/edit/EditDocumentScreen';
 import ConvertScreen from '../screens/convert/ConvertScreen';
 import AskAIScreen from '../screens/ai/AskAIScreen';
 import AIChatScreen from '../screens/ai/AIChatScreen';
-import FaxScreen from '../screens/fax/FaxScreen';
-import FaxSendScreen from '../screens/fax/FaxSendScreen';
+import SendScreen from '../screens/send/SendScreen';
+import SendShareScreen from '../screens/send/SendShareScreen';
 import NotificationCenterScreen from '../screens/notifications/NotificationCenterScreen';
 import NotificationDetailScreen from '../screens/notifications/NotificationDetailScreen';
 
@@ -93,8 +93,8 @@ function HomeNavigator() {
       <HomeStack.Screen name="Convert" component={ConvertScreen} />
       <HomeStack.Screen name="AskAI" component={AskAIScreen} />
       <HomeStack.Screen name="AIChat" component={AIChatScreen} />
-      <HomeStack.Screen name="Fax" component={FaxScreen} />
-      <HomeStack.Screen name="FaxSend" component={FaxSendScreen} />
+      <HomeStack.Screen name="Send" component={SendScreen} />
+      <HomeStack.Screen name="SendShare" component={SendShareScreen} />
       <HomeStack.Screen name="AllDocuments" component={AllDocumentsScreen} />
       <HomeStack.Screen name="DocumentView" component={DocumentViewScreen} />
       <HomeStack.Screen name="NotificationCenter" component={NotificationCenterScreen} />
@@ -213,7 +213,7 @@ export default function AppNavigator() {
     };
 
     const handleShareUrl = (url: string) => {
-      // Handle share links: https://zeni.app/share?token=xxx
+      // Handle share links: https://zenigh.online/share?token=xxx
       if (url.includes('share')) {
         try {
           const urlObj = new URL(url);
@@ -267,7 +267,7 @@ export default function AppNavigator() {
 
   // Deep linking configuration
   const linking = {
-    prefixes: ['https://zeni.app', 'zeni://'],
+    prefixes: ['https://zenigh.online', 'zeni://'],
     config: {
       screens: {
         Main: {

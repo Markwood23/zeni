@@ -47,7 +47,7 @@ const onboardingData = [
   {
     icon: 'notifications-outline',
     title: 'Stay Updated',
-    description: 'Get notified when your faxes are delivered and documents are ready.',
+    description: 'Get notified when your shares are delivered and documents are ready.',
     color: '#f59e0b',
     bgColor: 'rgba(245, 158, 11, 0.1)',
     permission: 'notifications',

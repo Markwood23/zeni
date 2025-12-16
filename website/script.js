@@ -193,51 +193,6 @@ if (initFromBadge && initToBadge) {
 // Cycle formats every 4 seconds
 setInterval(cycleFormats, 4000);
 
-// ========================================
-// Fax Status Animation
-// ========================================
-const faxStatuses = [
-    { text: 'Sending...', color: '#eab308' },
-    { text: 'Processing', color: '#017DE9' },
-    { text: 'Delivered', color: '#22c55e' }
-];
-
-let currentFaxStatus = 0;
-
-function cycleFaxStatus() {
-    const statusText = document.querySelector('.fax-status-text');
-    const statusDot = document.querySelector('.status-dot');
-    
-    if (!statusText || !statusDot) return;
-    
-    currentFaxStatus = (currentFaxStatus + 1) % faxStatuses.length;
-    const status = faxStatuses[currentFaxStatus];
-    
-    // Animate out
-    statusText.style.opacity = '0';
-    
-    setTimeout(() => {
-        statusText.textContent = status.text;
-        statusDot.style.background = status.color;
-        statusText.style.color = status.color;
-        statusText.style.opacity = '1';
-    }, 200);
-}
-
-// Add transition to status text
-const statusTextEl = document.querySelector('.fax-status-text');
-if (statusTextEl) {
-    statusTextEl.style.transition = 'opacity 0.2s ease, color 0.3s ease';
-}
-
-// Add transition to status dot
-const statusDotEl = document.querySelector('.status-dot');
-if (statusDotEl) {
-    statusDotEl.style.transition = 'background 0.3s ease';
-}
-
-// Cycle fax status every 5 seconds
-setInterval(cycleFaxStatus, 5000);
 
 // ========================================
 // Stats Counter Animation
@@ -309,4 +264,4 @@ faqItems.forEach(item => {
     });
 });
 
-// Fax animation is inline in HTML
+// Share animation is inline in HTML

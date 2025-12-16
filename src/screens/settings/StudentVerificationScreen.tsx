@@ -120,7 +120,7 @@ export default function StudentVerificationScreen() {
   const benefits = [
     { icon: 'cloud-outline', title: 'Unlimited Storage', desc: 'Store all your documents without limits', color: colors.uploadedIcon },
     { icon: 'flash-outline', title: 'Priority Processing', desc: 'Faster scans, conversions & AI responses', color: colors.warning },
-    { icon: 'send-outline', title: 'Free Faxing', desc: '50 free fax pages per month', color: colors.faxedIcon },
+    { icon: 'send-outline', title: 'Send & Share', desc: 'Unlimited document sharing', color: colors.primary },
     { icon: 'sparkles-outline', title: 'Advanced AI', desc: 'Full access to AI study tools', color: colors.askAiIcon },
     { icon: 'shield-checkmark-outline', title: 'Verified Badge', desc: 'Show your student status', color: colors.success },
   ];

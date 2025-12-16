@@ -22,7 +22,7 @@ export default function NotificationsScreen() {
     pushNotificationsEnabled,
     emailNotificationsEnabled,
     scanCompleteNotifications,
-    faxStatusNotifications,
+    shareStatusNotifications,
     aiResponseNotifications,
     tipsNotifications,
     updateNotifications,
@@ -52,10 +52,10 @@ export default function NotificationsScreen() {
       value: scanCompleteNotifications,
     },
     {
-      id: 'faxStatusNotifications',
-      title: 'Fax Status',
-      description: 'Updates on fax delivery',
-      value: faxStatusNotifications,
+      id: 'shareStatusNotifications',
+      title: 'Share Status',
+      description: 'Updates on document sharing',
+      value: shareStatusNotifications,
     },
     {
       id: 'aiResponseNotifications',

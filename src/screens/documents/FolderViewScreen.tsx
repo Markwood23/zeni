@@ -139,8 +139,8 @@ export default function FolderViewScreen() {
         return 'cloud-upload';
       case 'edited':
         return 'create';
-      case 'faxed':
-        return 'print';
+      case 'shared':
+        return 'send';
       case 'imported':
         return 'download';
       case 'converted':
@@ -158,8 +158,8 @@ export default function FolderViewScreen() {
         return colors.uploadedIcon;
       case 'edited':
         return colors.editIcon;
-      case 'faxed':
-        return colors.faxedIcon;
+      case 'shared':
+        return colors.primary;
       case 'imported':
         return colors.importedIcon;
       case 'converted':

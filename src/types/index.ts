@@ -1,6 +1,6 @@
 // Type definitions for Zeni app
 
-export type DocumentType = 'scanned' | 'uploaded' | 'edited' | 'converted' | 'faxed' | 'imported';
+export type DocumentType = 'scanned' | 'uploaded' | 'edited' | 'converted' | 'shared' | 'imported';
 
 export type DocumentFilter = 'all' | DocumentType;
 
@@ -103,32 +103,27 @@ export interface ShareAccessLog {
   userAgent?: string;
 }
 
-export type FaxStatus = 'pending' | 'sending' | 'delivered' | 'failed';
+export type ShareStatus = 'pending' | 'sending' | 'delivered' | 'failed';
 
-export interface FaxJob {
+export interface ShareJob {
   id: string;
   documentId: string;
   userId: string;
   recipientName: string;
-  recipientFaxNumber: string;
-  coverPageSubject?: string;
-  coverPageMessage?: string;
-  status: FaxStatus;
-  providerJobId?: string;
+  recipientEmail?: string;
+  shareMethod: 'email' | 'whatsapp' | 'link';
+  shareLink?: string;
+  accessType: ShareAccessType;
+  message?: string;
+  status: ShareStatus;
   errorMessage?: string;
   sentAt?: Date;
   deliveredAt?: Date;
+  viewCount?: number;
   createdAt: Date;
   updatedAt: Date;
 }
 
-export interface Institution {
-  id: string;
-  name: string;
-  faxNumber: string;
-  department?: string;
-  category: 'university' | 'college' | 'government' | 'embassy' | 'other';
-}
 
 export interface AIConversation {
   id: string;
@@ -152,7 +147,7 @@ export interface AIMessage {
 export interface Activity {
   id: string;
   userId: string;
-  type: 'scan' | 'edit' | 'convert' | 'fax' | 'share' | 'ai_chat' | 'upload' | 'delete' | 'move' | 'import';
+  type: 'scan' | 'edit' | 'convert' | 'send' | 'share' | 'ai_chat' | 'upload' | 'delete' | 'move' | 'import';
   documentId?: string;
   title: string;
   description?: string;
@@ -162,9 +157,9 @@ export interface Activity {
 
 // App Notification types
 export type NotificationType = 
-  | 'fax_sent' 
-  | 'fax_delivered' 
-  | 'fax_failed'
+  | 'share_sent' 
+  | 'share_delivered' 
+  | 'share_failed'
   | 'scan_complete'
   | 'convert_complete'
   | 'ai_complete'
@@ -219,8 +214,8 @@ export type HomeStackParamList = {
   ConvertResult: { documentId: string };
   AskAI: undefined;
   AIChat: { conversationId?: string; documentId?: string };
-  Fax: { documentId?: string };
-  FaxSend: { documentId: string };
+  Send: { documentId?: string };
+  SendShare: { documentId: string };
   AllDocuments: { initialFilter?: DocumentFilter } | undefined;
   DocumentView: { documentId: string };
   NotificationCenter: undefined;

@@ -38,8 +38,8 @@ export default function ActivityScreen() {
         return 'create-outline';
       case 'convert':
         return 'swap-horizontal-outline';
-      case 'fax':
-        return 'print-outline';
+      case 'send':
+        return 'send-outline';
       case 'share':
         return 'share-outline';
       case 'ai_chat':
@@ -65,8 +65,8 @@ export default function ActivityScreen() {
         return colors.editIcon;
       case 'convert':
         return colors.convertIcon;
-      case 'fax':
-        return colors.faxedIcon;
+      case 'send':
+        return colors.primary;
       case 'share':
         return colors.shareIcon;
       case 'ai_chat':

@@ -4,7 +4,7 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { User, Document, Folder, FaxJob, AIConversation, Activity, DocumentFilter, AppNotification, NotificationType, FolderShareLink } from '../types';
+import { User, Document, Folder, ShareJob, AIConversation, Activity, DocumentFilter, AppNotification, NotificationType, FolderShareLink } from '../types';
 
 // Generate unique IDs (defined first so it can be used in stores)
 export const generateId = (): string => {
@@ -132,33 +132,33 @@ export const useDocumentsStore = create<DocumentsState>()(
   )
 );
 
-// Fax Store
-interface FaxState {
-  faxJobs: FaxJob[];
-  addFaxJob: (job: FaxJob) => void;
-  updateFaxJob: (id: string, updates: Partial<FaxJob>) => void;
-  clearAllFaxes: () => void;
-  getFaxJobsByDocument: (documentId: string) => FaxJob[];
+// Share Store
+interface ShareState {
+  shareJobs: ShareJob[];
+  addShareJob: (job: ShareJob) => void;
+  updateShareJob: (id: string, updates: Partial<ShareJob>) => void;
+  clearAllShares: () => void;
+  getShareJobsByDocument: (documentId: string) => ShareJob[];
 }
 
-export const useFaxStore = create<FaxState>()(
+export const useShareStore = create<ShareState>()(
   persist(
     (set, get) => ({
-      faxJobs: [],
-      addFaxJob: (job: FaxJob) =>
-        set((state) => ({ faxJobs: [job, ...state.faxJobs] })),
-      updateFaxJob: (id: string, updates: Partial<FaxJob>) =>
+      shareJobs: [],
+      addShareJob: (job: ShareJob) =>
+        set((state) => ({ shareJobs: [job, ...state.shareJobs] })),
+      updateShareJob: (id: string, updates: Partial<ShareJob>) =>
         set((state) => ({
-          faxJobs: state.faxJobs.map((j) =>
+          shareJobs: state.shareJobs.map((j) =>
             j.id === id ? { ...j, ...updates, updatedAt: new Date() } : j
           ),
         })),
-      clearAllFaxes: () => set({ faxJobs: [] }),
-      getFaxJobsByDocument: (documentId: string) =>
-        get().faxJobs.filter((j) => j.documentId === documentId),
+      clearAllShares: () => set({ shareJobs: [] }),
+      getShareJobsByDocument: (documentId: string) =>
+        get().shareJobs.filter((j) => j.documentId === documentId),
     }),
     {
-      name: 'zeni-fax-storage',
+      name: 'zeni-share-storage',
       storage: createJSONStorage(() => AsyncStorage),
     }
   )
@@ -379,7 +379,7 @@ interface SettingsState {
   pushNotificationsEnabled: boolean;
   emailNotificationsEnabled: boolean;
   scanCompleteNotifications: boolean;
-  faxStatusNotifications: boolean;
+  shareStatusNotifications: boolean;
   aiResponseNotifications: boolean;
   tipsNotifications: boolean;
   updateNotifications: boolean;
@@ -399,7 +399,7 @@ export const useSettingsStore = create<SettingsState>()(
       pushNotificationsEnabled: true,
       emailNotificationsEnabled: true,
       scanCompleteNotifications: true,
-      faxStatusNotifications: true,
+      shareStatusNotifications: true,
       aiResponseNotifications: true,
       tipsNotifications: false,
       updateNotifications: true,
@@ -447,7 +447,7 @@ export const useFolderShareStore = create<FolderShareState>()(
           viewCount: 0,
           isActive: true,
           // Use a real web URL that can be opened in browser
-          shareUrl: `https://zeni.app/share?token=${shareToken}`,
+          shareUrl: `https://zenigh.online/share?token=${shareToken}`,
           createdAt: new Date(),
         };
         set((state) => ({

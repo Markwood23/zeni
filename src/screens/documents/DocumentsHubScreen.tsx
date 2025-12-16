@@ -31,7 +31,7 @@ const filters: { key: DocumentFilter; label: string }[] = [
   { key: 'scanned', label: 'Scanned' },
   { key: 'uploaded', label: 'Uploaded' },
   { key: 'edited', label: 'Edited' },
-  { key: 'faxed', label: 'Faxed' },
+  { key: 'shared', label: 'Shared' },
 ];
 
 export default function DocumentsHubScreen() {
@@ -129,8 +129,8 @@ export default function DocumentsHubScreen() {
         return 'cloud-upload';
       case 'edited':
         return 'create';
-      case 'faxed':
-        return 'print';
+      case 'shared':
+        return 'send';
       case 'imported':
         return 'download';
       case 'converted':
@@ -148,8 +148,8 @@ export default function DocumentsHubScreen() {
         return colors.uploadedIcon;
       case 'edited':
         return colors.editIcon;
-      case 'faxed':
-        return colors.faxedIcon;
+      case 'shared':
+        return colors.primary;
       case 'imported':
         return colors.importedIcon;
       case 'converted':
@@ -205,13 +205,13 @@ export default function DocumentsHubScreen() {
           },
         },
         {
-          text: 'Fax',
+          text: 'Send',
           onPress: () => {
             navigation.dispatch(
               CommonActions.navigate({
                 name: 'Home',
                 params: {
-                  screen: 'FaxSend',
+                  screen: 'SendShare',
                   params: { documentId: doc.id },
                 },
               })

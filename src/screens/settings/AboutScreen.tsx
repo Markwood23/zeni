@@ -31,7 +31,7 @@ const CHANGELOG = [
       'Initial release of Zeni',
       'Smart document scanning with edge detection',
       'PDF generation and editing',
-      'Fax sending to worldwide destinations',
+      'Send & Share documents via email, WhatsApp, or Zeni link',
       'AI-powered document assistant',
       'Custom folder organization with icons',
       'Signature creation and management',
@@ -147,7 +147,7 @@ export default function AboutScreen() {
           <Text style={[styles.missionText, { color: colors.textSecondary }]}>
             Zeni empowers Ghanaian students with powerful document management tools. 
             We believe every student deserves access to professional-grade scanning, 
-            faxing, and document organization capabilities.
+            sharing, and document organization capabilities.
           </Text>
         </View>
 
@@ -167,13 +167,13 @@ export default function AboutScreen() {
           </View>
 
           <View style={[styles.featureItem, { borderBottomColor: colors.borderLight }]}>
-            <View style={[styles.featureIcon, { backgroundColor: colors.faxedIcon + '15' }]}>
-              <Ionicons name="send-outline" size={22} color={colors.faxedIcon} />
+            <View style={[styles.featureIcon, { backgroundColor: colors.primary + '15' }]}>
+              <Ionicons name="send-outline" size={22} color={colors.primary} />
             </View>
             <View style={styles.featureInfo}>
-              <Text style={[styles.featureTitle, { color: colors.textPrimary }]}>Fax Anywhere</Text>
+              <Text style={[styles.featureTitle, { color: colors.textPrimary }]}>Send & Share</Text>
               <Text style={[styles.featureDesc, { color: colors.textTertiary }]}>
-                Send documents to fax machines worldwide
+                Share via email, WhatsApp, or Zeni link
               </Text>
             </View>
           </View>

@@ -38,7 +38,7 @@ const FAQ_DATA: FAQItem[] = [
   {
     category: 'Getting Started',
     question: 'Is Zeni free to use?',
-    answer: 'Yes! Zeni is free for basic features including document scanning, editing, and organizing. Premium features like unlimited faxing and cloud storage require a subscription.',
+    answer: 'Yes! Zeni is free for basic features including document scanning, editing, and organizing. Premium features like unlimited sharing and cloud storage require a subscription.',
   },
   // Scanning
   {
@@ -72,21 +72,21 @@ const FAQ_DATA: FAQItem[] = [
     question: 'How do I annotate a document?',
     answer: 'Use the Pen tool for freehand annotations, Highlighter for emphasis, or Shapes to add rectangles, circles, and arrows. All annotations are saved automatically.',
   },
-  // Faxing
+  // Send & Share
   {
-    category: 'Faxing',
-    question: 'How do I send a fax?',
-    answer: 'Go to the Fax section, select or scan a document, enter the recipient fax number with country code (e.g., +1 for USA), add an optional cover page, and tap Send.',
+    category: 'Send & Share',
+    question: 'How do I share a document?',
+    answer: 'Go to the Send section, select or scan a document, choose a sharing method (Email, WhatsApp, or Zeni Link), set permissions, and tap Share.',
   },
   {
-    category: 'Faxing',
-    question: 'How much does it cost to send a fax?',
-    answer: 'Fax credits depend on the destination. Domestic faxes (within Ghana) use 1 credit, international faxes use 2-5 credits depending on the country. Check pricing in the app.',
+    category: 'Send & Share',
+    question: 'What are the sharing options?',
+    answer: 'You can share via Email (send directly to an email address), WhatsApp (share with contacts), or Zeni Link (create a shareable link with customizable permissions).',
   },
   {
-    category: 'Faxing',
-    question: 'How do I know if my fax was delivered?',
-    answer: 'You\'ll receive a notification when your fax is delivered or if delivery fails. You can also check the status in the Fax History section.',
+    category: 'Send & Share',
+    question: 'How do I control who can view my shared documents?',
+    answer: 'When sharing, you can set permissions to "View Only" or "Download". You can also add password protection and set an expiry date for added security.',
   },
   // Organization
   {
@@ -156,18 +156,18 @@ const GUIDES: GuideItem[] = [
     ],
   },
   {
-    title: 'Send a Fax',
-    description: 'Step-by-step guide to sending faxes worldwide',
-    icon: 'print',
-    color: '#FF9500',
+    title: 'Send & Share Documents',
+    description: 'Step-by-step guide to sharing documents',
+    icon: 'send',
+    color: '#017DE9',
     steps: [
-      'Tap "Send Fax" from the home screen',
+      'Tap "Send" from the home screen',
       'Select a document or scan a new one',
-      'Enter the recipient fax number with country code',
-      'Optionally add a cover page with subject and message',
-      'Review the fax preview',
-      'Tap "Send Fax" to submit',
-      'Track delivery status in notifications',
+      'Choose how to share: Email, WhatsApp, or Zeni Link',
+      'Enter recipient details or generate a link',
+      'Set permissions: View Only or Download',
+      'Optionally add password protection',
+      'Tap "Share" to send your document',
     ],
   },
   {
@@ -202,7 +202,7 @@ const GUIDES: GuideItem[] = [
   },
 ];
 
-const CATEGORIES = ['All', 'Getting Started', 'Scanning', 'Editing', 'Faxing', 'Organization', 'AI Assistant', 'Security & Privacy', 'Account'];
+const CATEGORIES = ['All', 'Getting Started', 'Scanning', 'Editing', 'Send & Share', 'Organization', 'AI Assistant', 'Security & Privacy', 'Account'];
 
 export default function HelpSupportScreen() {
   const navigation = useNavigation();
@@ -221,7 +221,7 @@ export default function HelpSupportScreen() {
   });
 
   const handleContactSupport = () => {
-    Linking.openURL('mailto:support@zeniapp.com?subject=Zeni Support Request');
+    Linking.openURL('mailto:support@zenigh.online?subject=Zeni Support Request');
   };
 
   const handleWhatsApp = () => {
@@ -399,7 +399,7 @@ export default function HelpSupportScreen() {
             </View>
             <View style={styles.contactInfo}>
               <Text style={[styles.contactTitle, { color: colors.textPrimary }]}>Email Support</Text>
-              <Text style={[styles.contactDesc, { color: colors.textTertiary }]}>support@zeniapp.com</Text>
+              <Text style={[styles.contactDesc, { color: colors.textTertiary }]}>support@zenigh.online</Text>
             </View>
             <Ionicons name="open-outline" size={18} color={colors.textTertiary} />
           </TouchableOpacity>
@@ -434,7 +434,7 @@ export default function HelpSupportScreen() {
 
           <TouchableOpacity 
             style={[styles.contactItem, { borderBottomWidth: 0 }]}
-            onPress={() => Linking.openURL('https://zeniapp.com/feedback')}
+            onPress={() => Linking.openURL('https://zenigh.online/feedback')}
           >
             <View style={[styles.contactIcon, { backgroundColor: colors.warning + '15' }]}>
               <Ionicons name="chatbubble-outline" size={22} color={colors.warning} />

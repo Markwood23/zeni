@@ -21,7 +21,7 @@ import * as DocumentPicker from 'expo-document-picker';
 import { spacing, borderRadius, typography } from '../../constants/theme';
 import { useTheme } from '../../context/ThemeContext';
 import { HomeStackParamList, AIMessage, Document, AIConversation, Folder } from '../../types';
-import { useAIStore, useDocumentsStore, useUserStore, useActivityStore, useFaxStore, useSignaturesStore, useNotificationsStore, useSettingsStore, generateId } from '../../store';
+import { useAIStore, useDocumentsStore, useUserStore, useActivityStore, useShareStore, useSignaturesStore, useNotificationsStore, useSettingsStore, generateId } from '../../store';
 import aiService, { ChatMessage, FullAppContext, parseAIResponse, executeAction, AIAction, sendEmailWithMailComposer } from '../../utils/aiService';
 
 type NavigationProp = NativeStackNavigationProp<HomeStackParamList, 'AIChat'>;
@@ -39,7 +39,7 @@ export default function AIChatScreen() {
   const { documents, folders, deleteDocument, updateDocument, addFolder, updateFolder, deleteFolder, addDocument, addDocumentToFolder, removeDocumentFromFolder } = useDocumentsStore();
   const { user, setUser } = useUserStore();
   const { activities, addActivity, clearActivities } = useActivityStore();
-  const { faxJobs, addFaxJob, clearAllFaxes } = useFaxStore();
+  const { shareJobs, addShareJob, clearAllShares } = useShareStore();
   const { signatures } = useSignaturesStore();
   const { addNotification, clearAllNotifications, markAllAsRead } = useNotificationsStore();
   const { setNotificationSetting, setSecuritySetting } = useSettingsStore();
@@ -153,13 +153,15 @@ export default function AIChatScreen() {
     sendEmail: async (to: string, subject: string, body: string, attachments?: string[]) => {
       return await sendEmailWithMailComposer(to, subject, body, attachments);
     },
-    sendFax: (recipientName: string, faxNumber: string, documentId: string) => {
-      addFaxJob({
+    shareDocument: (recipientName: string, recipientEmail: string, documentId: string, shareMethod: 'email' | 'whatsapp' | 'link' = 'link') => {
+      addShareJob({
         id: generateId(),
         documentId,
         userId: user?.id || 'guest',
         recipientName,
-        recipientFaxNumber: faxNumber,
+        recipientEmail,
+        shareMethod,
+        accessType: 'view',
         status: 'pending',
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -205,7 +207,7 @@ export default function AIChatScreen() {
     clearNotifications: () => clearAllNotifications(),
     markAllNotificationsRead: () => markAllAsRead(),
     clearActivityHistory: () => clearActivities(),
-    clearFaxHistory: () => clearAllFaxes(),
+    clearShareHistory: () => clearAllShares(),
     updateProfile: (updates: { firstName?: string; lastName?: string; email?: string; phone?: string; school?: string }) => {
       if (user) {
         setUser({ ...user, ...updates });
@@ -213,7 +215,7 @@ export default function AIChatScreen() {
     },
     toggleSetting: (key: string, value: boolean) => {
       // Determine which setting type based on key
-      const notificationSettings = ['pushNotificationsEnabled', 'emailNotificationsEnabled', 'scanCompleteNotifications', 'faxStatusNotifications', 'aiResponseNotifications', 'tipsNotifications', 'updateNotifications'];
+      const notificationSettings = ['pushNotificationsEnabled', 'emailNotificationsEnabled', 'scanCompleteNotifications', 'shareStatusNotifications', 'aiResponseNotifications', 'tipsNotifications', 'updateNotifications'];
       const securitySettings = ['biometricEnabled', 'autoLockEnabled', 'saveActivityHistory', 'analyticsEnabled'];
       
       if (notificationSettings.includes(key)) {
@@ -222,7 +224,7 @@ export default function AIChatScreen() {
         setSecuritySetting(key, value);
       }
     },
-  }), [documents, folders, user, deleteDocument, updateDocument, addFolder, updateFolder, deleteFolder, addDocument, addDocumentToFolder, removeDocumentFromFolder, addFaxJob, navigation, addNotification, addActivity, clearAllNotifications, markAllAsRead, clearActivities, clearAllFaxes, setUser, setNotificationSetting, setSecuritySetting]);
+  }), [documents, folders, user, deleteDocument, updateDocument, addFolder, updateFolder, deleteFolder, addDocument, addDocumentToFolder, removeDocumentFromFolder, addShareJob, navigation, addNotification, addActivity, clearAllNotifications, markAllAsRead, clearActivities, clearAllShares, setUser, setNotificationSetting, setSecuritySetting]);
 
   // Handle document selection from picker
   const handleDocumentSelect = useCallback((doc: Document) => {
@@ -322,10 +324,11 @@ export default function AIChatScreen() {
         title: activity.title,
         createdAt: activity.createdAt,
       })),
-      faxHistory: faxJobs.slice(0, 10).map((fax: any) => ({
-        recipientName: fax.recipientName,
-        status: fax.status,
-        sentAt: fax.sentAt,
+      shareHistory: shareJobs.slice(0, 10).map((share: any) => ({
+        recipientName: share.recipientName,
+        shareMethod: share.shareMethod || 'email',
+        status: share.status,
+        sentAt: share.sentAt,
       })),
       signatures: signatures.map((sig: any) => ({
         id: sig.id,
@@ -335,11 +338,11 @@ export default function AIChatScreen() {
       stats: {
         totalDocuments: documents.length,
         totalFolders: folders.length,
-        totalFaxesSent: faxJobs.filter((f: any) => f.status === 'delivered').length,
+        totalSharesSent: shareJobs.filter((s: any) => s.status === 'delivered').length,
         storageUsed: totalStorageUsed,
       },
     };
-  }, [user, documents, folders, activities, faxJobs, signatures]);
+  }, [user, documents, folders, activities, shareJobs, signatures]);
 
   useEffect(() => {
     if (documentId) {

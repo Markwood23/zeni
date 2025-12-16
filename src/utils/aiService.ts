@@ -44,7 +44,6 @@ export type AIActionType =
   | 'create_folder'
   | 'create_document'
   | 'duplicate_document'
-  | 'send_fax'
   | 'share_document'
   | 'summarize'
   | 'extract_key_points'
@@ -56,7 +55,7 @@ export type AIActionType =
   | 'clear_notifications'
   | 'mark_notifications_read'
   | 'clear_activity_history'
-  | 'clear_fax_history'
+  | 'clear_share_history'
   | 'update_profile'
   | 'toggle_setting'
   | 'none';
@@ -86,10 +85,11 @@ export interface AIAction {
       body: string;
       attachmentIds?: string[];
     };
-    fax?: {
+    share?: {
       recipientName: string;
-      faxNumber: string;
+      recipientEmail: string;
       documentId: string;
+      shareMethod: 'email' | 'whatsapp' | 'link';
     };
     navigation?: {
       screen: string;
@@ -181,9 +181,10 @@ export interface FullAppContext {
     title: string;
     createdAt: Date;
   }>;
-  // Fax history
-  faxHistory?: Array<{
+  // Share history
+  shareHistory?: Array<{
     recipientName: string;
+    shareMethod: string;
     status: string;
     sentAt?: Date;
   }>;
@@ -199,7 +200,7 @@ export interface FullAppContext {
   stats?: {
     totalDocuments: number;
     totalFolders: number;
-    totalFaxesSent: number;
+    totalSharesSent: number;
     storageUsed: number;
   };
 }
@@ -361,10 +362,10 @@ Your personality:
 - Compose professional emails based on document content
 - Send documents as email attachments
 
-**Fax Actions:**
-- SEND faxes to any fax number
-- Help compose fax cover pages
-- CLEAR fax history (requires confirmation)
+**Share Actions:**
+- SHARE documents via email, WhatsApp, or Zeni link
+- Set share permissions (view only or download)
+- CLEAR share history (requires confirmation)
 
 **Organization Actions:**
 - CREATE new folders
@@ -414,13 +415,13 @@ Action Types:
 - "create_folder" - params: { folderName }
 - "create_document" - params: { newDocument: { name, content, type: "study_guide"|"notes"|"summary"|"text", folderId? } }
 - "duplicate_document" - params: { documentId, documentName } - Make a copy
-- "send_fax" - params: { fax: { recipientName, faxNumber, documentId } }
+- "share_document" - params: { share: { recipientName, recipientEmail, documentId, shareMethod: "email"|"whatsapp"|"link" } }
 - "navigate" - params: { navigation: { screen, params? } }
 - "request_document_selection" - params: { selectionPrompt, selectionPurpose } - USE THIS when user wants to work on a document but hasn't specified which one
 - "clear_notifications" - Clear all notifications - REQUIRES CONFIRMATION
 - "mark_notifications_read" - Mark all notifications as read
 - "clear_activity_history" - Clear activity history - REQUIRES CONFIRMATION
-- "clear_fax_history" - Clear all fax history - REQUIRES CONFIRMATION
+- "clear_share_history" - Clear all share history - REQUIRES CONFIRMATION
 - "update_profile" - params: { profileUpdate: { firstName?, lastName?, email?, phone?, school? } }
 - "toggle_setting" - params: { setting: { key, value } } - Toggle app settings like "biometricEnabled", "autoLockEnabled", "analyticsEnabled"
 
@@ -468,7 +469,7 @@ IMPORTANT RULES:
       prompt += `\n\nUser's Workspace Stats:
 - Total Documents: ${appContext.stats.totalDocuments}
 - Total Folders: ${appContext.stats.totalFolders}
-- Faxes Sent: ${appContext.stats.totalFaxesSent}
+- Shares Sent: ${appContext.stats.totalSharesSent}
 - Storage Used: ${(appContext.stats.storageUsed / (1024 * 1024)).toFixed(1)} MB`;
     }
 
@@ -500,11 +501,11 @@ IMPORTANT RULES:
       });
     }
 
-    // Add fax history
-    if (appContext?.faxHistory && appContext.faxHistory.length > 0) {
-      prompt += `\n\nRecent Fax History:`;
-      appContext.faxHistory.slice(0, 5).forEach((fax, i) => {
-        prompt += `\n- To: ${fax.recipientName} (${fax.status})`;
+    // Add share history
+    if (appContext?.shareHistory && appContext.shareHistory.length > 0) {
+      prompt += `\n\nRecent Share History:`;
+      appContext.shareHistory.slice(0, 5).forEach((share, i) => {
+        prompt += `\n- To: ${share.recipientName} via ${share.shareMethod} (${share.status})`;
       });
     }
 
@@ -772,7 +773,7 @@ export interface ActionExecutor {
   createDocument: (name: string, content: string, type: string, folderId?: string) => string;
   duplicateDocument: (documentId: string) => string | null;
   sendEmail: (to: string, subject: string, body: string, attachments?: string[]) => Promise<boolean>;
-  sendFax: (recipientName: string, faxNumber: string, documentId: string) => void;
+  shareDocument: (recipientName: string, recipientEmail: string, documentId: string, shareMethod?: 'email' | 'whatsapp' | 'link') => void;
   navigate: (screen: string, params?: Record<string, any>) => void;
   addNotification: (notification: any) => void;
   addActivity: (activity: any) => void;
@@ -781,7 +782,7 @@ export interface ActionExecutor {
   clearNotifications: () => void;
   markAllNotificationsRead: () => void;
   clearActivityHistory: () => void;
-  clearFaxHistory: () => void;
+  clearShareHistory: () => void;
   updateProfile: (updates: { firstName?: string; lastName?: string; email?: string; phone?: string; school?: string }) => void;
   toggleSetting: (key: string, value: boolean) => void;
 }
@@ -919,13 +920,13 @@ export async function executeAction(
         }
         return { success: false, message: 'No email details provided' };
 
-      case 'send_fax':
-        if (action.params?.fax) {
-          const { recipientName, faxNumber, documentId } = action.params.fax;
-          executor.sendFax(recipientName, faxNumber, documentId);
-          return { success: true, message: `Fax queued to ${recipientName}` };
+      case 'share_document':
+        if (action.params?.share) {
+          const { recipientName, recipientEmail, documentId, shareMethod } = action.params.share;
+          executor.shareDocument(recipientName, recipientEmail, documentId, shareMethod);
+          return { success: true, message: `Document shared to ${recipientName} via ${shareMethod}` };
         }
-        return { success: false, message: 'No fax details provided' };
+        return { success: false, message: 'No share details provided' };
 
       case 'navigate':
         if (action.params?.navigation) {
@@ -972,9 +973,9 @@ export async function executeAction(
         executor.clearActivityHistory();
         return { success: true, message: 'Activity history cleared' };
 
-      case 'clear_fax_history':
-        executor.clearFaxHistory();
-        return { success: true, message: 'Fax history cleared' };
+      case 'clear_share_history':
+        executor.clearShareHistory();
+        return { success: true, message: 'Share history cleared' };
 
       case 'update_profile':
         if (action.params?.profileUpdate) {
