@@ -10,17 +10,32 @@
     --primary-light: #e8f4fd;
     --primary-glow: rgba(1, 125, 233, 0.2);
     
-    /* Feature Card Colors - Blue-based monochromatic palette */
-    --accent-green: #017DE9;
-    --accent-green-bg: #F0F7FF;
-    --accent-purple: #017DE9;
-    --accent-purple-bg: #F0F7FF;
-    --accent-yellow: #017DE9;
-    --accent-yellow-bg: #F0F7FF;
-    --accent-pink: #017DE9;
-    --accent-pink-bg: #F0F7FF;
-    --accent-orange: #017DE9;
-    --accent-orange-bg: #F0F7FF;
+    /* Feature Card Palette - Complementary to Blue Primary
+       Using colors that harmonize with blue while being distinct */
+    
+    /* Scan - Teal/Cyan: Tech, precision, clarity */
+    --card-scan: #0891B2;
+    --card-scan-bg: #ECFEFF;
+    
+    /* Edit - Indigo: Creativity, tools, signature */
+    --card-edit: #6366F1;
+    --card-edit-bg: #EEF2FF;
+    
+    /* Convert - Violet: Transform, magic, change */
+    --card-convert: #7C3AED;
+    --card-convert-bg: #F5F3FF;
+    
+    /* Keep legacy variables for compatibility */
+    --accent-green: var(--card-scan);
+    --accent-green-bg: var(--card-scan-bg);
+    --accent-purple: var(--card-edit);
+    --accent-purple-bg: var(--card-edit-bg);
+    --accent-yellow: var(--card-convert);
+    --accent-yellow-bg: var(--card-convert-bg);
+    --accent-pink: #EC4899;
+    --accent-pink-bg: #fce7f3;
+    --accent-orange: #F97316;
+    --accent-orange-bg: #ffedd5;
     
     /* Light theme (default) */
     --bg: #fafafa;
@@ -64,12 +79,16 @@
     --card-shadow: 0 1px 3px rgba(0,0,0,0.4), 0 4px 20px rgba(0,0,0,0.25);
     --card-shadow-hover: 0 8px 30px rgba(0,0,0,0.4);
     
-    /* Dark mode accent backgrounds - Blue-based */
-    --accent-green-bg: rgba(1, 125, 233, 0.12);
-    --accent-purple-bg: rgba(1, 125, 233, 0.12);
-    --accent-yellow-bg: rgba(1, 125, 233, 0.12);
-    --accent-pink-bg: rgba(1, 125, 233, 0.12);
-    --accent-orange-bg: rgba(1, 125, 233, 0.12);
+    /* Dark mode - Deeper, richer backgrounds */
+    --card-scan-bg: rgba(8, 145, 178, 0.15);
+    --card-edit-bg: rgba(99, 102, 241, 0.15);
+    --card-convert-bg: rgba(124, 58, 237, 0.15);
+    
+    --accent-green-bg: var(--card-scan-bg);
+    --accent-purple-bg: var(--card-edit-bg);
+    --accent-yellow-bg: var(--card-convert-bg);
+    --accent-pink-bg: rgba(236, 72, 153, 0.15);
+    --accent-orange-bg: rgba(249, 115, 22, 0.15);
 }
 
 /* Reset & Base */
@@ -1163,10 +1182,12 @@ body {
     box-shadow: var(--card-shadow-hover);
 }
 
-/* Colorful Card Variants - Clean Blue Theme */
+/* Feature Card Variants - Each with distinct but harmonious colors */
+
+/* Scan Card - Teal/Cyan */
 .bento-card.card-green {
-    background: var(--accent-green-bg);
-    border-color: rgba(1, 125, 233, 0.15);
+    background: var(--card-scan-bg);
+    border: 1px solid rgba(8, 145, 178, 0.2);
 }
 
 .bento-card.card-green h3,
@@ -1175,13 +1196,14 @@ body {
 }
 
 .bento-card.card-green .card-icon {
-    background: var(--primary);
+    background: var(--card-scan);
     color: white;
 }
 
+/* Edit Card - Indigo */
 .bento-card.card-purple {
-    background: var(--accent-purple-bg);
-    border-color: rgba(1, 125, 233, 0.15);
+    background: var(--card-edit-bg);
+    border: 1px solid rgba(99, 102, 241, 0.2);
 }
 
 .bento-card.card-purple h3,
@@ -1190,13 +1212,14 @@ body {
 }
 
 .bento-card.card-purple .card-icon {
-    background: var(--primary);
+    background: var(--card-edit);
     color: white;
 }
 
+/* Convert Card - Violet */
 .bento-card.card-yellow {
-    background: var(--accent-yellow-bg);
-    border-color: rgba(1, 125, 233, 0.15);
+    background: var(--card-convert-bg);
+    border: 1px solid rgba(124, 58, 237, 0.2);
 }
 
 .bento-card.card-yellow h3,
@@ -1205,7 +1228,7 @@ body {
 }
 
 .bento-card.card-yellow .card-icon {
-    background: var(--primary);
+    background: var(--card-convert);
     color: white;
 }
 
