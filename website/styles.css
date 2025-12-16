@@ -1057,24 +1057,6 @@ body {
     }
     
     .floating-element {
-        transform: scale(0.6);
-        opacity: 0.7;
-    }
-    
-    /* Reposition for mobile - keep only 2-3 visible */
-    .floating-element.element-1 {
-        top: 8%;
-        left: 2%;
-    }
-    
-    .floating-element.element-2 {
-        top: 12%;
-        right: 2%;
-    }
-    
-    .floating-element.element-3,
-    .floating-element.element-4,
-    .floating-element.element-5 {
         display: none;
     }
     
